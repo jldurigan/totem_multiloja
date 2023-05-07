@@ -27,8 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'totem_cliente',
-    'totem_restaurante',
+    'totem_cliente.apps.TotemClienteConfig',
+    'totem_restaurante.apps.TotemRestauranteConfig',
 ]
 
 MIDDLEWARE = [
