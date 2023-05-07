@@ -1,8 +1,8 @@
 from django.contrib import admin
 from .models import *
 
-class ListarAnexos(admin.ModelAdmin):
-    list_display=("id", "titulo", "nome", "ativo")
+class ListarImagens(admin.ModelAdmin):
+    list_display=("id", "titulo", "caminho", "ativo")
     list_display_links=("id", "titulo")
     search_fields=("titulo",)
 
@@ -26,7 +26,7 @@ class ListarItemPedidos(admin.ModelAdmin):
     list_display_links=("id", "pedido")
     search_fields=("produto",)
 
-admin.site.register(Anexo, ListarAnexos)
+admin.site.register(Imagem, ListarImagens)
 admin.site.register(Restaurante, ListarRestaurantes)
 admin.site.register(Produto, ListarProdutos)
 admin.site.register(Pedido, ListarPedidos)

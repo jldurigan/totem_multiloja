@@ -1,8 +1,8 @@
 from django.db import models
 
-class Anexo(models.Model):
-    titulo = models.CharField(max_length=30, null=False, blank=False, default="anexo")
-    nome = models.CharField(max_length=50, null=False, blank=False)
+class Imagem(models.Model):
+    titulo = models.CharField(max_length=30, null=False, blank=False, default="imagem")
+    caminho = models.ImageField(upload_to="imagens/%Y/%m/%d/", blank=True)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):
@@ -10,7 +10,7 @@ class Anexo(models.Model):
     
 class Restaurante(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
-    anexo = models.ManyToManyField(Anexo)
+    imagem = models.ManyToManyField(Imagem)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):
@@ -20,7 +20,7 @@ class Produto(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
     valor = models.DecimalField(max_digits=5, decimal_places=2)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
-    anexo = models.ManyToManyField(Anexo)
+    imagem = models.ManyToManyField(Imagem)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):
