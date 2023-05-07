@@ -4,5 +4,5 @@ from .models import *
 
 def listar_restaurantes(request):
     restaurantes = Restaurante.objects.all()
-    
-    return render(request, "inicio.html")
+
+    return render(request, "totem_cliente/inicio.html", {"restaurantes": restaurantes})
