@@ -8,6 +8,10 @@ def listar_restaurantes(request):
     return render(request, "totem_cliente/inicio.html", {"restaurantes": restaurantes})
 
 def listar_produtos(request):
-    produtos = Produto.objects.order_by("nome").filter(restaurante=request.GET.id, ativo=True)
-    
-    return render(request, "totem_cliente/produtos.html", {"produtos": produtos})
+    return render(request, "totem_cliente/produtos.html")
+
+def listar_carrinho(request):
+    return render(request, "totem_cliente/carrinho.html")
+
+def listar_pagamento(request):
+    return render(request, "totem_cliente/pagamento.html")
