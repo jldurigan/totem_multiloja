@@ -4,13 +4,23 @@
 <!-- Masthead-->
 <header class="masthead">
   <div class="container">
-      <div class="masthead-subheading">Bem vindo!</div>
-      <div class="masthead-heading text-uppercase">Cardápio Fácil</div> 
-      <form method="post" action="">
-          <input type="text" name="pesquisa" placeholder="Pesquisar...">
-          <input type="submit" value="...">
-      </form>
+    <div class="masthead-subheading">Bem vindo!</div>
+    <div class="masthead-heading text-uppercase">Cardápio Fácil</div>
+    <form method="post" action="">
+      <input type="text" name="pesquisa" placeholder="Pesquisar...">
+      <input type="submit" value="...">
+    </form>
+  </div>
+  <div class="container">
+    {% for restaurante in restaurantes %}
+    <div>
+      <a href="{% url 'produtos' restaurante.id%}">
+        <img class="img-fluid" src={{restaurante.logo.url}}>
+        <span>{{restaurante.nome}}</span>
+      </a>
+    </div>
+    {%endfor%}
   </div>
 </header>
-  
+
 {% endblock %}

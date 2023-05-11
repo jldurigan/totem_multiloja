@@ -7,8 +7,10 @@ def listar_restaurantes(request):
 
     return render(request, "totem_cliente/inicio.html", {"restaurantes": restaurantes})
 
-def listar_produtos(request):
-    return render(request, "totem_cliente/produtos.html")
+def listar_produtos(request, restaurante_id):
+    produtos = Produto.objects.order_by("nome").filter(ativo=True, restaurante_id=restaurante_id)
+    
+    return render(request, "totem_cliente/produtos.html", {"produtos": produtos})
 
 def listar_carrinho(request):
     return render(request, "totem_cliente/carrinho.html")

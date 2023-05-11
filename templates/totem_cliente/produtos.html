@@ -7,4 +7,14 @@
         <input type="submit" value="...">
     </form>
 </div>
+<div class="container">
+    {% for produto in produtos %}
+    <div>
+      <a href="">
+        <img class="img-fluid" src={{produto.imagem.url}}>
+        <span>{{produto.nome}}</span>
+      </a>
+    </div>
+    {%endfor%}
+  </div>
 {% endblock %}''
