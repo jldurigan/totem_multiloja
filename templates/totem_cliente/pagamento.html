@@ -1,5 +1,71 @@
-{% extends "totem_cliente/base.html" %}
+
+{% extends 'totem_cliente/base.html' %}
+{% include 'components/quote_detail.html' with quote=second_quote %}
+{% include 'components/quote_detail.html' with quote=first_quote %}
+
+
 {% block content %}
 {% load static %}
 
+  
+
+  <div class="container-fluid border border-dark p-5">
+    <div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="row">
+            <section class="col-md-6">
+              <div class="row m-5">
+                <div class="col-md-12">
+                  <button class="btn btn-dark">Voltar</button>
+                </div>
+              </div>                                                                        
+
+              <div class="row m-5">
+                <div class="col-md-12">
+                  <h2>Produtos selecionados:</h2>
+                  <ul class="list-group">
+                    <li class="list-group-item">An item</li>
+                    <li class="list-group-item">A second item</li>
+                    <li class="list-group-item">A third item</li>
+                    <li class="list-group-item">A fourth item</li>
+                    <li class="list-group-item">And a fifth one</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="col-md-6">
+              <div class="row m-5">
+                <div class="col-md-12">
+                  <h4 class="h5">Forma de pagamento:</h4>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
+                    <label class="form-check-label" for="flexRadioDefault1">Crédito</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked />
+                    <label class="form-check-label" for="flexRadioDefault2">Débito</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked />
+                    <label class="form-check-label" for="flexRadioDefault2">Pix</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row justify-content-end text-right m-5">
+                <div class="col-md-12">
+                  
+                  <button type="button" class="btn btn-cta-secondary" data-toggle="modal" data-target="#{{ quote.priceId }}" data-id="{{ quote.priceId }}">More Info</button>
+
+                  <!-- Modal -->
+                  <div class="modal fade" id="{{ quote.priceId }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}''

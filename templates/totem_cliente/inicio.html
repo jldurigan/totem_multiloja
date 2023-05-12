@@ -2,15 +2,75 @@
 {% block content %}
 {% load static %}
 <!-- Masthead-->
-<header class="masthead">
-  <div class="container">
-      <div class="masthead-subheading">Bem vindo!</div>
-      <div class="masthead-heading text-uppercase">Cardápio Fácil</div> 
-      <form method="post" action="">
-          <input type="text" name="pesquisa" placeholder="Pesquisar...">
-          <input type="submit" value="...">
-      </form>
-  </div>
+<header class="masthead" style="background: url('static/assets/img/fotos/fundo.webp')">
+    <div class="container" >
+        <div class="masthead-subheading">Bem vindo!</div>
+        <div class="masthead-heading text-uppercase">Cardápio Fácil</div> 
+        <form method="post" action="">
+          <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
+            <input type="text" class="form-control" placeholder="Pesquisar" aria-label="Example text with button addon" aria-describedby="button-addon1">
+            <button class="btn btn-secondary" type="button" id="button-addon1">...</button>
+        </div>
+        </form>
+
+        <div class="row m-4">
+          <div class="col-12">
+
+            <div class="row justify-content-between">
+                <div class="col-md-3 m-1">
+                    <div class="card">
+                        <div class="card-body">
+                          <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 m-1">
+                  <div class="card">
+                      <div class="card-body">
+                        <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                      </div>
+                  </div>
+              </div>
+              <div class="col-md-3 m-1">
+                <div class="card">
+                    <div class="card-body">
+                      <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                    </div>
+                </div>
+              </div>
+              <div class="col-md-3 m-1">
+                <div class="card">
+                    <div class="card-body">
+                      <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 m-1">
+              <div class="card">
+                  <div class="card-body">
+                    <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-3 m-1">
+            <div class="card">
+                <div class="card-body">
+                  <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                </div>
+            </div>
+        </div>
+            
+                
+                
+            </div>
+        </div>
+        </div>
+    </div>
+
+    
+  
 </header>
+
+
   
 {% endblock %}''
