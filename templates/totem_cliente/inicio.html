@@ -14,7 +14,7 @@
   <div class="container">
     {% for restaurante in restaurantes %}
     <div>
-      <a href="{% url 'produtos' restaurante.id%}">
+      <a href="{% url 'listar_produtos' restaurante.id%}">
         <img class="img-fluid" src={{restaurante.logo.url}}>
         <span>{{restaurante.nome}}</span>
       </a>

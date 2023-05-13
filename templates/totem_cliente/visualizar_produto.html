@@ -1,0 +1,17 @@
+{% extends "totem_cliente/base.html" %}
+{% block content %}
+{% load static %}
+<div class="container">
+  <form method="post" action="">
+    <input type="text" name="pesquisa" placeholder="Pesquisar...">
+    <input type="submit" value="...">
+  </form>
+</div>
+<div class="container">
+  <div>
+      <img class="img-fluid" src={{produto.imagem.url}}>
+      <span>{{produto.nome}}</span>
+  </div>
+  <a href="{% url 'add_carrinho' produto.id %}">Adicionar ao carrinho</a>
+</div>
+{% endblock %}

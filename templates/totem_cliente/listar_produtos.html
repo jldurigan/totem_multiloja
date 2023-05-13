@@ -10,11 +10,11 @@
 <div class="container">
     {% for produto in produtos %}
     <div>
-      <a href="">
+      <a href="{% url 'visualizar_produto' produto.id%}">
         <img class="img-fluid" src={{produto.imagem.url}}>
         <span>{{produto.nome}}</span>
       </a>
     </div>
     {%endfor%}
   </div>
-{% endblock %}''
+{% endblock %}

@@ -26,8 +26,22 @@ class ListarItemPedidos(admin.ModelAdmin):
     list_display_links=("id", "pedido")
     search_fields=("produto",)
     list_per_page=10
+    
+class ListarCarrinhos(admin.ModelAdmin):
+    list_display=("id", "restaurante", "valor_total")
+    list_display_links=("id", "restaurante")
+    search_fields=("id",)
+    list_per_page=10
+    
+class ListarItemCarrinhos(admin.ModelAdmin):
+    list_display=("id", "carrinho", "produto", "quantidade")
+    list_display_links=("id", "carrinho")
+    search_fields=("produto",)
+    list_per_page=10
 
 admin.site.register(Restaurante, ListarRestaurantes)
 admin.site.register(Produto, ListarProdutos)
 admin.site.register(Pedido, ListarPedidos)
 admin.site.register(ItemPedido, ListarItemPedidos)
+admin.site.register(Carrinho, ListarCarrinhos)
+admin.site.register(ItemCarrinho, ListarItemCarrinhos)

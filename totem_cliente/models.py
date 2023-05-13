@@ -35,3 +35,13 @@ class ItemPedido(models.Model):
     
     def __str__(self):
         return self.produto.nome
+    
+class Carrinho(models.Model):
+    restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)    
+    valor_total = models.DecimalField(max_digits=6, decimal_places=2)
+    
+class ItemCarrinho(models.Model):
+    carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    quantidade = models.IntegerField()
+    
