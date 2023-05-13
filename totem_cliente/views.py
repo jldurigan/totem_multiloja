@@ -11,7 +11,7 @@ def listar_restaurantes(request):
 def listar_produtos(request, restaurante_id):
     produtos = Produto.objects.order_by("nome").filter(ativo=True, restaurante_id=restaurante_id)
     
-    return render(request, "totem_cliente/listar_produtos.html", {"produtos": produtos})
+    return render(request, "totem_cliente/produtos.html", {"produtos": produtos})
 
 def visualizar_produto(request, produto_id):
     produto = get_object_or_404(Produto, pk=produto_id)
@@ -26,7 +26,7 @@ def add_carrinho(request, produto_id):
     item_carrinho = ItemCarrinho(carrinho=carrinho, produto=produto, quantidade=1)
     item_carrinho.save()
     
-    itens_carrinho = ItemCarrinho.objects.filter(carr)
+    # itens_carrinho = ItemCarrinho.objects.filter(carr)
     return render(request, "totem_cliente/carrinho.html", {"item_carrinho": item_carrinho})
 
 def listar_carrinho(request):

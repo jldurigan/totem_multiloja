@@ -16,48 +16,17 @@
     <div class="row m-4">
       <div class="col-12">
         <div class="row justify-content-between">
+          {% for restaurante in restaurantes %}
           <div class="col-md-3 m-1">
             <div class="card">
               <div class="card-body">
-                <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
+                <a href="{% url 'listar_produtos' restaurante.id %}">
+                  <img src={{restaurante.logo.url}} class="card-img-top" alt="{{restaurante.nome}}">
+                </a>
               </div>
             </div>
           </div>
-          <div class="col-md-3 m-1">
-            <div class="card">
-              <div class="card-body">
-                <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 m-1">
-            <div class="card">
-              <div class="card-body">
-                <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 m-1">
-            <div class="card">
-              <div class="card-body">
-                <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 m-1">
-            <div class="card">
-              <div class="card-body">
-                <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 m-1">
-            <div class="card">
-              <div class="card-body">
-                <img src={%static "assets/img/fotos/logo.png" %} class="card-img-top" alt="Imagem 1">
-              </div>
-            </div>
-          </div>
+          {%endfor%}
         </div>
       </div>
     </div>
