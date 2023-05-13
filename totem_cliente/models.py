@@ -8,9 +8,20 @@ class Restaurante(models.Model):
     def __str__(self):
         return self.nome
     
-class Produto(models.Model):
+class Ingrediente(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
     valor = models.DecimalField(max_digits=5, decimal_places=2)
+    imagem = models.ImageField(upload_to="imagens/%Y/%m/%d/", blank=True)
+    ativo = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.nome
+    
+class Produto(models.Model):
+    nome = models.CharField(max_length=40, null=False, blank=False)
+    descricao = models.TextField(max_length=200, null=False, blank=False)
+    valor = models.DecimalField(max_digits=5, decimal_places=2)
+    ingredientes = models.ManyToManyField(Ingrediente, related_name="produtos")
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
     imagem = models.ImageField(upload_to="imagens/%Y/%m/%d/", blank=True)
     ativo = models.BooleanField(default=True)

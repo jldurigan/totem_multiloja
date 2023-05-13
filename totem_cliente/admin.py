@@ -8,6 +8,13 @@ class ListarRestaurantes(admin.ModelAdmin):
     search_fields=("nome",)
     list_per_page=10
     
+class ListarIngredientes(admin.ModelAdmin):
+    list_display=("id", "nome", "valor", "imagem", "ativo")
+    list_display_links=("id", "nome")
+    list_editable=("valor", "imagem", "ativo")
+    search_fields=("nome",)
+    list_per_page=10
+    
 class ListarProdutos(admin.ModelAdmin):
     list_display=("id", "nome", "valor", "imagem", "restaurante", "ativo")
     list_display_links=("id", "nome")
@@ -40,6 +47,7 @@ class ListarItemCarrinhos(admin.ModelAdmin):
     list_per_page=10
 
 admin.site.register(Restaurante, ListarRestaurantes)
+admin.site.register(Ingrediente, ListarIngredientes)
 admin.site.register(Produto, ListarProdutos)
 admin.site.register(Pedido, ListarPedidos)
 admin.site.register(ItemPedido, ListarItemPedidos)
