@@ -14,6 +14,7 @@ class Categoria(models.Model):
     imagem = models.ImageField(upload_to='imagens/categorias/%Y/%m/%d/', blank=True)
     visivel = models.BooleanField(default=True)
     ativo = models.BooleanField(default=True)
+    restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.nome
@@ -37,6 +38,7 @@ class Produto(models.Model):
     imagem = models.ImageField(upload_to='imagens/produtos/%Y/%m/%d/', blank=True)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
     categoria = models.ManyToManyField(Categoria)
+    visivel = models.BooleanField(default=True)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):

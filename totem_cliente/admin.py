@@ -9,9 +9,9 @@ class ListarRestaurantes(admin.ModelAdmin):
     list_per_page=10
     
 class ListarCategorias(admin.ModelAdmin):
-    list_display=("id", "nome", "imagem", "visivel", "ativo")
+    list_display=("id", "nome", "imagem", "restaurante", "visivel", "ativo")
     list_display_links=("id", "nome")
-    list_editable=("imagem", "visivel", "ativo")
+    list_editable=("imagem", "restaurante", "visivel", "ativo")
     search_fields=("nome",)
     list_per_page=10
     
@@ -23,9 +23,9 @@ class ListarIngredientes(admin.ModelAdmin):
     list_per_page=10
     
 class ListarProdutos(admin.ModelAdmin):
-    list_display=("id", "nome", "descricao", "preco", "imagem", "restaurante", "ativo")
+    list_display=("id", "nome", "descricao", "preco", "imagem", "restaurante", "visivel", "ativo")
     list_display_links=("id", "nome")
-    list_editable=("descricao", "preco", "restaurante", "ativo")
+    list_editable=("descricao", "preco", "restaurante", "visivel", "ativo")
     search_fields=("nome", "categoria", "restaurante")
     list_per_page=10
     
