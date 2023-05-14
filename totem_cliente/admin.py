@@ -15,39 +15,18 @@ class ListarCategorias(admin.ModelAdmin):
     search_fields=("nome",)
     list_per_page=10
     
-class ListarIngredientes(admin.ModelAdmin):
-    list_display=("id", "nome", "preco_extra", "imagem", "ativo")
-    list_display_links=("id", "nome")
-    list_editable=("preco_extra", "imagem", "ativo")
-    search_fields=("nome", "categoria")
-    list_per_page=10
-    
 class ListarProdutos(admin.ModelAdmin):
-    list_display=("id", "nome", "descricao", "preco", "imagem", "restaurante", "visivel", "ativo")
+    list_display=("id", "nome", "preco", "imagem", "restaurante", "visivel", "ativo")
     list_display_links=("id", "nome")
-    list_editable=("descricao", "preco", "restaurante", "visivel", "ativo")
+    list_editable=("preco", "restaurante", "visivel", "ativo")
     search_fields=("nome", "categoria", "restaurante")
     list_per_page=10
     
-class ListarProdutoIngredientes(admin.ModelAdmin):
-    list_display=("id", "produto", "ingrediente", "quantidade", "padrao", "ativo")
-    list_display_links=("id", "produto")
-    list_editable=("ingrediente", "quantidade", "padrao", "ativo")
-    search_fields=("nome", "produto", "ingrediente")
-    list_per_page=10
-    
-class ListarCombos(admin.ModelAdmin):
-    list_display=("id", "nome", "descricao", "preco", "imagem", "restaurante", "ativo")
-    list_display_links=("id", "nome")
-    list_editable=("descricao", "preco", "imagem", "restaurante", "ativo")
-    search_fields=("nome", "produto", "categoria", "restaurante")
-    list_per_page=10
-    
-class ListarComboProdutos(admin.ModelAdmin):
-    list_display=("id", "combo", "produto", "quantidade", "padrao", "ativo")
-    list_display_links=("id", "combo")
-    list_editable=("produto", "quantidade", "padrao", "ativo")
-    search_fields=("nome", "combo")
+class ListarProdutoParteProdutos(admin.ModelAdmin):
+    list_display=("id", "produto_pai", "produto_parte", "quantidade", "padrao", "ativo")
+    list_display_links=("id", "produto_pai")
+    list_editable=("produto_parte", "quantidade", "padrao", "ativo")
+    search_fields=("nome", "produto_pai")
     list_per_page=10
     
 class ListarPedidos(admin.ModelAdmin):
@@ -57,31 +36,14 @@ class ListarPedidos(admin.ModelAdmin):
     list_per_page=10
     
 class ListarItemPedidos(admin.ModelAdmin):
-    list_display=("id", "pedido", "produto", "combo", "quantidade", "preco", "observacoes", "ativo")
+    list_display=("id", "pedido", "produto", "quantidade", "preco", "observacoes", "ativo")
     list_display_links=("id", "pedido")
-    search_fields=("produto", "produto", "combo")
+    search_fields=("produto", "produto")
     list_per_page=10
-    
-# class ListarCarrinhos(admin.ModelAdmin):
-#     list_display=("id", "restaurante", "valor_total")
-#     list_display_links=("id", "restaurante")
-#     search_fields=("id",)
-#     list_per_page=10
-    
-# class ListarItemCarrinhos(admin.ModelAdmin):
-#     list_display=("id", "carrinho", "produto", "quantidade")
-#     list_display_links=("id", "carrinho")
-#     search_fields=("produto",)
-#     list_per_page=10
 
 admin.site.register(Restaurante, ListarRestaurantes)
 admin.site.register(Categoria, ListarCategorias)
-admin.site.register(Ingrediente, ListarIngredientes)
 admin.site.register(Produto, ListarProdutos)
-admin.site.register(ProdutoIngrediente, ListarProdutoIngredientes)
-admin.site.register(Combo, ListarCombos)
-admin.site.register(ComboProduto, ListarComboProdutos)
+admin.site.register(ProdutoParteProduto, ListarProdutoParteProdutos)
 admin.site.register(Pedido, ListarPedidos)
 admin.site.register(ItemPedido, ListarItemPedidos)
-# admin.site.register(Carrinho, ListarCarrinhos)
-# admin.site.register(ItemCarrinho, ListarItemCarrinhos)

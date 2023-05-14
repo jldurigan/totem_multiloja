@@ -9,20 +9,34 @@ def listar_restaurantes(request):
 
 #produto
 def listar_produtos(request, restaurante_id):
-    produtos = Produto.objects.order_by("nome").filter(ativo=True, visivel=True, restaurante_id=restaurante_id)
     categorias = Categoria.objects.order_by("nome").filter(ativo=True, visivel=True, restaurante_id=restaurante_id)
+    
+    produtos = Produto.objects.order_by("nome").filter(restaurante_id=restaurante_id, visivel=True, ativo=True)
     
     return render(request, "totem_cliente/produtos.html", {"produtos": produtos, "categorias": categorias})
 
 def adicionar_produto(request, produto_id):
     produto = get_object_or_404(Produto, pk=produto_id)
     
-    produto_ingredientes = ProdutoIngrediente.objects.filter(produto=produto, ativo=True)
+    adicionais = ProdutoParteProduto.objects.filter(produto_pai=produto, ativo=True)
     
-    return render(request, "totem_cliente/adicionar_produto.html", {"produto": produto, "produto_ingredientes": produto_ingredientes})
+    return render(request, "totem_cliente/adicionar_produto.html", {"produto": produto, "adicionais": adicionais})
 
 #carrinho
-def add_carrinho(request, produto_id):
+def add_carrinho(request):
+    carrinho = 'carrinho'
+    item = {
+        'produto': '',
+        'quantidade': '',
+        'preco': '',
+        'observacoes': ''
+    }
+    
+    if carrinho in request.session[carrinho]:
+        request.session[carrinho].insert(0, item)
+    else:
+        request.session[carrinho]=[item]
+    
     # produto = get_object_or_404(Produto, pk=produto_id)
     # carrinho = Carrinho(restaurante=produto.restaurante, valor_total=0)
     # carrinho.save()

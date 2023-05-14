@@ -14,11 +14,11 @@
         <span>{{produto.nome}}</span>
         <span>{{produto.descricao}}</span>
     </div>
-    {% for produto_ingrediente in produto_ingredientes %}
+    {% for adicional in adicionais %}
     <div>
-        <img class="img-fluid" src="{{produto_ingrediente.ingrediente.imagem.url}}">
-        <span>{{produto_ingrediente.ingrediente.nome}}</span>
-        <p>{{produto_ingrediente.quantidade}}</p>
+        <img class="img-fluid" src="{{adicional.produto_parte.imagem.url}}">
+        <span>{{adicional.produto_parte.nome}}</span>
+        <p>{{adicional.quantidade}}</p>
     </div>
     {%endfor%}
     <a href="{% url 'add_carrinho' produto.id %}">Adicionar ao carrinho</a>

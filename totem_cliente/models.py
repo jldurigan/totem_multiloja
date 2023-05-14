@@ -8,7 +8,6 @@ class Restaurante(models.Model):
     def __str__(self):
         return self.nome
 
-
 class Categoria(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
     imagem = models.ImageField(upload_to='imagens/categorias/%Y/%m/%d/', blank=True)
@@ -19,21 +18,9 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nome
 
-
-class Ingrediente(models.Model):
-    nome = models.CharField(max_length=40, null=False, blank=False)
-    preco_extra = models.DecimalField(max_digits=4, decimal_places=2)
-    imagem = models.ImageField(upload_to='imagens/ingredientes/%Y/%m/%d/', blank=True)
-    categoria = models.ManyToManyField(Categoria)
-    ativo = models.BooleanField(default=True)
-    
-    def __str__(self):
-        return self.nome
-
-
 class Produto(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
-    descricao = models.TextField(max_length=500, blank=False, null=False)
+    descricao = models.TextField(max_length=500, null=True, blank=True)
     preco = models.DecimalField(max_digits=7, decimal_places=2)
     imagem = models.ImageField(upload_to='imagens/produtos/%Y/%m/%d/', blank=True)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
@@ -43,40 +30,16 @@ class Produto(models.Model):
     
     def __str__(self):
         return self.nome
-    
-class ProdutoIngrediente(models.Model):
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    ingrediente = models.ForeignKey(Ingrediente, on_delete=models.CASCADE)
-    padrao = models.BooleanField(default=False)
-    quantidade = models.PositiveIntegerField(default=0)
-    ativo = models.BooleanField(default=True)
 
-    def __str__(self):
-        return f"{self.produto.nome} - {self.ingrediente.nome}"
-
-
-class Combo(models.Model):
-    nome = models.CharField(max_length=100, null=False, blank=False)
-    descricao = models.TextField(max_length=500, blank=False, null=False)
-    preco = models.DecimalField(max_digits=7, decimal_places=2)
-    imagem = models.ImageField(upload_to='imagens/combos/%Y/%m/%d/', blank=True)
-    restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
-    categoria = models.ManyToManyField(Categoria)
-    ativo = models.BooleanField(default=True)
-    
-    def __str__(self):
-        return self.nome
-
-class ComboProduto(models.Model):
-    combo = models.ForeignKey(Combo, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+class ProdutoParteProduto(models.Model):
+    produto_pai = models.ForeignKey(Produto, on_delete=models.CASCADE, related_name="produtos_pais")
+    produto_parte = models.ForeignKey(Produto, on_delete=models.CASCADE, related_name="produtos_partes")
     quantidade = models.PositiveIntegerField(default=0)
     padrao = models.BooleanField(default=False)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.combo.nome} - {self.produto.nome}"
-
+        return f"{self.produto_pai.nome} - {self.produto_parte.nome}"
 
 class Pedido(models.Model):
     codigo_interno = models.CharField(max_length=10, null=False, blank=False)
@@ -90,11 +53,9 @@ class Pedido(models.Model):
     def __str__(self):
         return f"{self.restaurante.nome} - Pedido {self.codigo_interno}"
 
-
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, null=True, blank=True, on_delete=models.CASCADE)
-    combo = models.ForeignKey(Combo, null=True, blank=True, on_delete=models.CASCADE)
     quantidade = models.PositiveIntegerField(default=1)
     preco = models.DecimalField(max_digits=7, decimal_places=2)
     observacoes = models.TextField(blank=True)
