@@ -13,8 +13,8 @@ class Categoria(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
     imagem = models.ImageField(upload_to='imagens/categorias/%Y/%m/%d/', blank=True)
     visivel = models.BooleanField(default=True)
-    ativo = models.BooleanField(default=True)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
+    ativo = models.BooleanField(default=True)
     
     def __str__(self):
         return self.nome
@@ -24,6 +24,7 @@ class Ingrediente(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
     preco_extra = models.DecimalField(max_digits=4, decimal_places=2)
     imagem = models.ImageField(upload_to='imagens/ingredientes/%Y/%m/%d/', blank=True)
+    restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
     categoria = models.ManyToManyField(Categoria)
     ativo = models.BooleanField(default=True)
     
@@ -47,8 +48,9 @@ class Produto(models.Model):
 class ProdutoIngrediente(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     ingrediente = models.ForeignKey(Ingrediente, on_delete=models.CASCADE)
-    padrao = models.BooleanField(default=False)
-    quantidade = models.PositiveIntegerField(default=0)
+    quantidade_padrao = models.PositiveIntegerField(default=0)
+    quantidade_minima = models.PositiveIntegerField(default=0)
+    quantidade_maxima = models.PositiveIntegerField(default=1)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -71,7 +73,8 @@ class ComboProduto(models.Model):
     combo = models.ForeignKey(Combo, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     quantidade = models.PositiveIntegerField(default=0)
-    padrao = models.BooleanField(default=False)
+    alternativa = models.BooleanField(default=False)
+    principal = models.BooleanField(default=False)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -93,12 +96,21 @@ class Pedido(models.Model):
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, null=True, blank=True, on_delete=models.CASCADE)
-    combo = models.ForeignKey(Combo, null=True, blank=True, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, null=True, blank=True, on_delete=models.PROTECT)
+    combo = models.ForeignKey(Combo, null=True, blank=True, on_delete=models.PROTECT)
     quantidade = models.PositiveIntegerField(default=1)
     preco = models.DecimalField(max_digits=7, decimal_places=2)
-    observacoes = models.TextField(blank=True)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):
         return f"{self.pedido.restaurante.nome} Pedido {self.pedido.codigo_interno} Item {self.id}"
+    
+class ItemAlteracao(models.Model):
+    item = models.ForeignKey(ItemPedido, on_delete=models.CASCADE)
+    ingrediente = models.ForeignKey(Ingrediente, on_delete=models.PROTECT)
+    quantidade_alterada = models.PositiveIntegerField(default=0)
+    ativo = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"Pedido: {self.item.pedido.codigo_interno} {self.ingrediente.nome} - Quantidade: {self.quantidade_alterada}"
+    
