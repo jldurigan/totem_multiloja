@@ -1,6 +1,7 @@
 {% extends "totem_cliente/base.html" %}
 {% block content %}
 {% load static %}
+{% load l10n %}
 
 <div class="container">
     <form method="post" action="">
@@ -9,18 +10,25 @@
     </form>
 </div>
 <div class="container">
-    <div>
-        <img class="img-fluid" src={{produto.imagem.url}}>
-        <span>{{produto.nome}}</span>
-        <span>{{produto.descricao}}</span>
-    </div>
-    {% for adicional in adicionais %}
-    <div>
-        <img class="img-fluid" src="{{adicional.produto_parte.imagem.url}}">
-        <span>{{adicional.produto_parte.nome}}</span>
-        <p>{{adicional.quantidade}}</p>
-    </div>
-    {%endfor%}
-    <a href="{% url 'add_carrinho' produto.id %}">Adicionar ao carrinho</a>
+    <form action="{% url 'adicionar_item'%}" method="POST">
+        {% csrf_token %}
+        <div>
+            <input type="hidden" name="produto_id" value="{{produto.id}}">
+            <img class="img-fluid" src={{produto.imagem.url}}>
+            <span>{{produto.nome}}</span>
+            <span>{{produto.descricao}}</span>
+            <input type="number" name="produto_preco" value="{{ produto.preco|unlocalize }}">
+            <input type="text" name="produto_observacoes">
+        </div>
+        {% for adicional in adicionais %}
+        <div>
+            <input type="hidden" name="produto_parte_id" value="{{adicional.produto_parte.id}}">
+            <img class="img-fluid" src="{{adicional.produto_parte.imagem.url}}">
+            <span>{{adicional.produto_parte.nome}}</span>
+            <input type="number" name="item_quantidade" value="{{adicional.quantidade_padrao}}" min="{{adicional.quantidade_minima}}" max="{{adicional.quantidade_maxima}}">
+        </div>
+        {%endfor%}
+        <button type="submit" value="Adicionar">Adicionar ao carrinho</button>
+    </form>
 </div>
 {% endblock %}

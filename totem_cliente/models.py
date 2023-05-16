@@ -32,14 +32,15 @@ class Produto(models.Model):
         return self.nome
 
 class ProdutoParteProduto(models.Model):
-    produto_pai = models.ForeignKey(Produto, on_delete=models.CASCADE, related_name="produtos_pais")
+    produto_principal = models.ForeignKey(Produto, on_delete=models.CASCADE, related_name="produtos_pais")
     produto_parte = models.ForeignKey(Produto, on_delete=models.CASCADE, related_name="produtos_partes")
-    quantidade = models.PositiveIntegerField(default=0)
-    padrao = models.BooleanField(default=False)
+    quantidade_padrao = models.PositiveIntegerField(default=0)
+    quantidade_minima = models.PositiveIntegerField(default=0)
+    quantidade_maxima = models.PositiveIntegerField(default=1)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.produto_pai.nome} - {self.produto_parte.nome}"
+        return f"{self.produto_principal.nome} - {self.produto_parte.nome}"
 
 class Pedido(models.Model):
     codigo_interno = models.CharField(max_length=10, null=False, blank=False)
@@ -59,6 +60,7 @@ class ItemPedido(models.Model):
     quantidade = models.PositiveIntegerField(default=1)
     preco = models.DecimalField(max_digits=7, decimal_places=2)
     observacoes = models.TextField(blank=True)
+    parte = models.BooleanField(default=True)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):

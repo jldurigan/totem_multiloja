@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from .models import *
 
@@ -18,33 +18,35 @@ def listar_produtos(request, restaurante_id):
 def adicionar_produto(request, produto_id):
     produto = get_object_or_404(Produto, pk=produto_id)
     
-    adicionais = ProdutoParteProduto.objects.filter(produto_pai=produto, ativo=True)
+    adicionais = ProdutoParteProduto.objects.filter(produto_principal=produto, ativo=True)
     
     return render(request, "totem_cliente/adicionar_produto.html", {"produto": produto, "adicionais": adicionais})
 
 #carrinho
-def add_carrinho(request):
-    carrinho = 'carrinho'
-    item = {
-        'produto': '',
-        'quantidade': '',
-        'preco': '',
-        'observacoes': ''
-    }
-    
-    if carrinho in request.session[carrinho]:
-        request.session[carrinho].insert(0, item)
+def adicionar_item(request):
+    if request.method != 'POST':
+        return redirect('adicionar_produto')
     else:
-        request.session[carrinho]=[item]
+        item_parte = []
+        for data in request.POST.get('produto_parte_id'):
+            item_parte.append(data)
+        # item = {
+        #     'produto': request.POST.get('produto_id'),
+        #     'quantidade': request.POST.get('quantidade'),
+        #     'preco': '',
+        #     'observacoes': ''
+        # }
+        
+        # if 'carrinho' in request.session['carrinho']:
+        #     request.session['carrinho'].insert(0, item)
+        # else:
+        #     request.session['carrinho']=[item]
+        
+        carrinho = request.session.get('carrinho')
+        
+        request.session.modified=True
     
-    # produto = get_object_or_404(Produto, pk=produto_id)
-    # carrinho = Carrinho(restaurante=produto.restaurante, valor_total=0)
-    # carrinho.save()
-    # item_carrinho = ItemCarrinho(carrinho=carrinho, produto=produto, quantidade=1)
-    # item_carrinho.save()
-    
-    # # itens_carrinho = ItemCarrinho.objects.filter(carr)
-    return render(request, "totem_cliente/carrinho.html", {"item_carrinho": item_carrinho})
+    return render(request, "totem_cliente/carrinho.html", {"carrinho": carrinho})
 
 def listar_carrinho(request):
     return render(request, "totem_cliente/carrinho.html")

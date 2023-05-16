@@ -10,7 +10,7 @@ urlpatterns = [
     
     #carrinho
     path('carrinho', listar_carrinho, name="listar_carrinho"),
-    path('add_carrinho/<int:produto_id>', add_carrinho, name="add_carrinho"),
+    path('adicionar_item', adicionar_item, name="adicionar_item"),
     
     #pagamento
     path('pagamento', listar_pagamento, name="listar_pagamento")
