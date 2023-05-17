@@ -9,8 +9,8 @@ def listar_restaurantes(request):
 
 #produto
 def listar_produtos(request, restaurante_id):
-    produtos = Produto.objects.order_by("nome").filter(ativo=True, visivel=True, restaurante_id=restaurante_id)
-    categorias = Categoria.objects.order_by("nome").filter(ativo=True, visivel=True, restaurante_id=restaurante_id)
+    produtos = Produto.objects.order_by("nome").filter(ativo=True, restaurante_id=restaurante_id)
+    categorias = Categoria.objects.order_by("nome").filter(ativo=True, restaurante_id=restaurante_id)
     
     return render(request, "totem_cliente/produtos.html", {"produtos": produtos, "categorias": categorias})
 
