@@ -17,9 +17,7 @@ def listar_produtos(request, restaurante_id):
 def adicionar_produto(request, produto_id):
     produto = get_object_or_404(Produto, pk=produto_id)
     
-    produto_ingredientes = ProdutoIngrediente.objects.filter(produto=produto, ativo=True)
-    
-    return render(request, "totem_cliente/adicionar_produto.html", {"produto": produto, "produto_ingredientes": produto_ingredientes})
+    return render(request, "totem_cliente/adicionar_produto.html", {"produto": produto})
 
 #carrinho
 def add_carrinho(request, produto_id):
