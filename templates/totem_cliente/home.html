@@ -8,9 +8,9 @@
     <div class="masthead-heading text-uppercase">Cardápio Fácil</div>
     <form method="post" action="">
       <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
-        <input type="text" class="form-control" placeholder="Pesquisar" aria-label="Example text with button addon"
+        <input type="text" class="form-control" placeholder="Procure um restaurante" aria-label="Example text with button addon"
           aria-describedby="button-addon1">
-        <button class="btn btn-secondary" type="button" id="button-addon1">...</button>
+        <button class="btn btn-light" type="button" id="button-addon1">&#128269;</button>
       </div>
     </form>
     <div class="row m-4">
@@ -18,10 +18,14 @@
         <div class="row justify-content-between">
           {% for restaurante in restaurantes %}
           <div class="col-md-3 m-1">
-            <div class="card">
+            <div class="card border-0">
               <div class="card-body">
                 <a href="{% url 'listar_produtos' restaurante.id %}">
-                  <img src={{restaurante.imagem.url}} class="card-img-top" alt="{{restaurante.nome}}">
+                  {% if restaurante.imagem == "" or restaurante.imagem == null %}
+                  <img src="{% static 'assets/img/sem_foto.png' %}" class="img-fluid object-fit-contain" alt="{{restaurante.nome}}">
+                  {% else %}
+                  <img src={{restaurante.imagem.url}} class="img-fluid object-fit-contain" alt="{{restaurante.nome}}">
+                  {% endif %}
                 </a>
               </div>
             </div>

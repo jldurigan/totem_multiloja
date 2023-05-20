@@ -3,61 +3,70 @@
 {% load static %}
 
 <div>
+    <div class="col-md-12 mb-5">
+        <div class="container">
+            <form method="post" action="">
+                <h1 class="masthead-subheading" style="display: flex; width:40%; margin:0px auto;">
+                    PRODUTOS</h1>
+                <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
+                    <input type="text" class="form-control" placeholder="Procure um produto"
+                        aria-label="Example text with button addon" aria-describedby="button-addon1">
+                    <button class="btn btn-secondary" type="button" id="button-addon1">&#128269;</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <h5 id="quantidadeCarrinho"></h5>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-3 align-self-center">
-                <ul class="nav flex-column">
+            <div class="col-md-3">
+                <ul class="list-group">
                     {% for categoria in categorias %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">{{categoria.nome}}</a>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <p><a class="link-unstyled" href="#">{{categoria.nome}}</a></p>
                     </li>
                     {%endfor%}
                 </ul>
             </div>
-            <section class="col-md-9">
+            <div class="col-md-9" style="max-height: 750px; overflow: auto">
                 <div class="row">
-                    <div class="col-md-12 mb-5">
-                        <div class="container">
-                            <form method="post" action="">
-                                <h1 class="masthead-subheading" style="display: flex; width:40%; margin:0px auto;">
-                                    PRODUTOS</h1>
-                                <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
-                                    <input type="text" class="form-control" placeholder="Pesquisar"
-                                        aria-label="Example text with button addon" aria-describedby="button-addon1">
-                                    <button class="btn btn-secondary" type="button" id="button-addon1">...</button>
+                    <div class="row justify-content-between">
+                        {% for produto in produtos%}
+                        <div class="m-1" style="max-width: 150px">
+                            <div class="card border-0">
+                                <div>
+                                    {% if produto.imagem == "" or produto.imagem == null %}
+                                    <img src="{% static 'assets/img/sem_foto.png' %}"
+                                        class="img-fluid object-fit-contain" alt="{{restaurante.nome}}">
+                                    {% else %}
+                                    <img src="{{produto.imagem.url}}" class="img-fluid object-fit-contain"
+                                        alt="{{produto.nome}}">
+                                    {% endif %}
+                                    <div class="text-center">
+                                        <span class="card-title">{{produto.nome}}</span>
+                                    </div>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="row justify-content-between">
-                            {% for produto in produtos%}
-                            <div class="col-md-3 m-1">
-                                <div class="card">
-                                    <img src="{{produto.imagem.url}}" class="card-img-top" alt="{{produto.nome}}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{produto.nome}}</h5>
-                                        <p class="card-text block-with-text">{{produto.descricao}}</p>
-                                        <a href="{% url 'adicionar_produto' produto.id%}" class="btn btn-primary">Adicionar ao pedido</a>
+                                <div class="card-body d-flex flex-column">
+                                    <div class="mt-auto">
+                                        <a href="javascript: AdicionarProduto({{produto.id}})"
+                                            class="btn btn-success">ADICIONAR</a>
                                     </div>
                                 </div>
                             </div>
-                            {%endfor%}
                         </div>
+                        {%endfor%}
                     </div>
                 </div>
-                <div class="row justify-content-end">
-                    <div class="col-md-12">
-                        <button class="btn btn-dark text-end">
-                            AVANÇAR
-                        </button>
-                    </div>
-                </div>
-            </section>
+            </div>
+            <div class="d-flex align-items-end flex-column ">
+                <button class="btn btn-dark text-end">
+                    AVANÇAR
+                </button>
+            </div>
         </div>
     </div>
 </div>
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -65,6 +74,17 @@
         $('.menu-toggle').click(function () {
             $('.sidebar').toggleClass('active');
         });
+
+        ExibirAmbiente("{{restaurante.nome}}", "{{restaurante.imagem.url}}")
     });
-</script> -->
+
+    function AdicionarProduto(id) {
+        var url = "{% url 'adicionar_produto' 0 %}".replace("0", id);
+        $.get(url, function (data, status) {
+            $("#quantidadeCarrinho").text(Object.keys(data).length)
+        }).fail(function(){
+            alert(data.Mensagem);
+        });
+    }
+</script>
 {% endblock %}

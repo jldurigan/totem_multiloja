@@ -1,14 +1,22 @@
 {% load static %}
 
-<div id="page-top">
-    <nav class="navbar navbar-expand-lg fixed-top " style="background: rgb(157, 87, 32, 0.8);" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand" href="#page-top"><img src={%static "assets/img/fotos/logo.png" %} alt="..." /></a>
-            <div class="ml-auto">
-                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="#page-top">Home</a></li>
-                </ul>
-            </div>
+<nav class="navbar navbar-expand-lg fixed-top sticky-top " style="background-color: #b87c4c;" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}"><img src="{%static 'assets/img/fotos/logo.png' %}" alt="Cardápio Fácil" /></a>
+        <div>
+            <span id="spanNomeRestaurante"></span>
+            <img id="imagemRestaurante" style="max-width: 75px">
         </div>
-    </nav>
-</div>
+        <div class="ml-auto">
+            <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+    function ExibirAmbiente(nome, imagemUrl){
+        $("#spanNomeRestaurante").html("Você está em: "+nome)
+        $("#imagemRestaurante").attr("src", imagemUrl)
+    }
+</script>

@@ -11,21 +11,19 @@ class Restaurante(models.Model):
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
-    imagem = models.ImageField(upload_to='imagens/categorias/%Y/%m/%d/', blank=True)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):
-        return self.nome
+        return f"{self.nome} - {self.restaurante.nome}"
 
 
 class Produto(models.Model):
     nome = models.CharField(max_length=40, null=False, blank=False)
-    descricao = models.TextField(max_length=500, blank=False, null=False)
     preco = models.DecimalField(max_digits=7, decimal_places=2)
     imagem = models.ImageField(upload_to='imagens/produtos/%Y/%m/%d/', blank=True)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
-    categoria = models.ManyToManyField(Categoria)    
+    categoria = models.ManyToManyField(Categoria)
     ativo = models.BooleanField(default=True)
     
     def __str__(self):

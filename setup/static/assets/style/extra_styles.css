@@ -20,3 +20,7 @@
     margin-top: 0.2em;
     background: white;
   }
+  .link-unstyled, .link-unstyled:link, .link-unstyled:hover {
+    color: inherit;
+    text-decoration: inherit;
+  }
