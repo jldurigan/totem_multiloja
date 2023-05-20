@@ -9,6 +9,28 @@ def home(request):
 
     return render(request, "totem_cliente/home.html", {"restaurantes": restaurantes})
 
+def buscar_restaurantes(request):
+    resultado = {
+        "Retorno": [],
+        "Mensagem": "",
+        "Sucesso": False
+    }
+    
+    if request.method != "POST":
+        resultado["Mensagem"] = ["Ação inválida!"]
+    else:
+        restaurantes = Restaurante.objects.order_by("nome").filter(ativo=True)
+        
+        if "nome" in request.POST:
+            nome = request.POST["nome"]
+            if nome:
+                restaurantes = restaurantes.filter(nome__icontains=nome)
+                for restaurante in restaurantes:
+                    resultado["Retorno"].insert(0, restaurante.id)
+                resultado["Sucesso"] = True
+                
+    return JsonResponse(resultado, safe=False)
+            
 #produto
 def listar_produtos(request, restaurante_id):
     restaurante = get_object_or_404(Restaurante, pk=restaurante_id)
@@ -22,25 +44,53 @@ def listar_produtos(request, restaurante_id):
     
     return render(request, "totem_cliente/produtos.html", {"restaurante": restaurante, "produtos": produtos, "categorias": categorias})
 
-def adicionar_produto(request, produto_id):
-    if 'restaurante' not in request.session:
-        return JsonResponse({"Mensagem": "Ação inválida!"})
+def buscar_produtos(request):
+    resultado = {
+        "Retorno": [],
+        "Mensagem": "",
+        "Sucesso": False
+    }
     
-    # produto = get_object_or_404(Produto, pk=produto_id, restaurante=request.session['restaurante'][0])
-        
-    
-    if 'carrinho' in request.session:
-        request.session['carrinho'].insert(0, produto_id)
+    if request.method != "POST" or "restaurante" not in request.session:
+        resultado["Mensagem"] = ["Ação inválida!"]
     else:
-        request.session['carrinho'] = [produto_id]
+        produtos = Produto.objects.order_by("nome").filter(ativo=True, restaurante=request.session["restaurante"][0])
         
-    request.session.modified=True
+        if "nome" in request.POST:
+            nome = request.POST["nome"]
+            if nome:
+                produtos = produtos.filter(nome__icontains=nome)
+                for produto in produtos:
+                    resultado["Retorno"].insert(0, produto.id)
+                resultado["Sucesso"] = True
+                
+    return JsonResponse(resultado, safe=False)
+
+def adicionar_produto(request, produto_id):
+    resultado = {
+        "Retorno": [],
+        "Mensagem": "",
+        "Sucesso": False
+    }
     
-    carrinho = []
-    for item in request.session['carrinho']:
-        carrinho.append[item]
+    if 'restaurante' not in request.session:
+        resultado["Mensagem"] = ["Ação inválida!"]
+    else:
+        # produto = get_object_or_404(Produto, pk=produto_id, restaurante=request.session['restaurante'][0])
+            
+        if 'carrinho' in request.session:
+            request.session['carrinho'].insert(0, produto_id)
+        else:
+            request.session['carrinho'] = [produto_id]
+            
+        request.session.modified=True
+        
+        for item in request.session['carrinho']:
+            resultado["Retorno"].insert(0, item)
+        
+        resultado["Sucesso"] = True
     
-    return JsonResponse(carrinho, safe=False)
+    return JsonResponse(resultado, safe=False)
 
 def remover_produto(request, produto_id):
     if 'carrinho' in request.session:
@@ -54,7 +104,14 @@ def remover_produto(request, produto_id):
     return JsonResponse(carrinho)
 
 def listar_carrinho(request):
-    # if 'carrinho' in request.session:
+    resultado = {
+        "Retorno": [],
+        "Mensagem": "",
+        "Sucesso": False
+    }
+    
+    if 'carrinho' not in request.session:
+        return JsonResponse("")
         
     return render(request, "totem_cliente/carrinho.html")
 

@@ -2,67 +2,69 @@
 {% block content %}
 {% load static %}
 
-<div>
-    <div class="col-md-12 mb-5">
-        <div class="container">
-            <form method="post" action="">
-                <h1 class="masthead-subheading" style="display: flex; width:40%; margin:0px auto;">
-                    PRODUTOS</h1>
-                <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
-                    <input type="text" class="form-control" placeholder="Procure um produto"
-                        aria-label="Example text with button addon" aria-describedby="button-addon1">
-                    <button class="btn btn-secondary" type="button" id="button-addon1">&#128269;</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <h5 id="quantidadeCarrinho"></h5>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3">
-                <ul class="list-group">
-                    {% for categoria in categorias %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <p><a class="link-unstyled" href="#">{{categoria.nome}}</a></p>
-                    </li>
-                    {%endfor%}
-                </ul>
+<div class="col-md-12 mb-5">
+    <div class="container">
+        <form id="formProduto">
+            {% csrf_token %}
+            <div class=>
+                <h1 class="masthead-subheading align-self-center py-5"
+                    style="display: flex; width:40%; margin:0px auto;">PRODUTOS</h1>
             </div>
-            <div class="col-md-9" style="max-height: 750px; overflow: auto">
-                <div class="row">
-                    <div class="row justify-content-between">
-                        {% for produto in produtos%}
-                        <div class="m-1" style="max-width: 150px">
-                            <div class="card border-0">
-                                <div>
-                                    {% if produto.imagem == "" or produto.imagem == null %}
-                                    <img src="{% static 'assets/img/sem_foto.png' %}"
-                                        class="img-fluid object-fit-contain" alt="{{restaurante.nome}}">
-                                    {% else %}
-                                    <img src="{{produto.imagem.url}}" class="img-fluid object-fit-contain"
-                                        alt="{{produto.nome}}">
-                                    {% endif %}
-                                    <div class="text-center">
-                                        <span class="card-title">{{produto.nome}}</span>
-                                    </div>
+            <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
+                <input type="text" id="txtBuscar" name="nome" class="form-control" placeholder="Procure um produto">
+                <button class="btn btn-light" type="button" onclick="BuscarProdutos()">&#128269;</button>
+            </div>
+        </form>
+    </div>
+    <button class="btn btn-warning" id="btnLimparFiltro" onclick="LimparFiltro()" style="display: none">Limpar
+        Filtro</button>
+</div>
+<h5 id="quantidadeCarrinho"></h5>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="list-group">
+                {% for categoria in categorias %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <p><a class="link-unstyled" href="#">{{categoria.nome}}</a></p>
+                </li>
+                {%endfor%}
+            </ul>
+        </div>
+        <div class="col-md-9" style="max-height: 750px; overflow: auto">
+            <div class="row">
+                <div class="row justify-content-between">
+                    {% for produto in produtos%}
+                    <div class="m-1 divProduto" id="divProduto-{{produto.id}}" style="max-width: 150px">
+                        <div class="card border-0">
+                            <div>
+                                {% if produto.imagem == "" or produto.imagem == null %}
+                                <img src="{% static 'assets/img/sem_foto.png' %}" class="img-fluid object-fit-contain"
+                                    alt="{{restaurante.nome}}">
+                                {% else %}
+                                <img src="{{produto.imagem.url}}" class="img-fluid object-fit-contain"
+                                    alt="{{produto.nome}}">
+                                {% endif %}
+                                <div class="text-center">
+                                    <span class="card-title">{{produto.nome}}</span>
                                 </div>
-                                <div class="card-body d-flex flex-column">
-                                    <div class="mt-auto">
-                                        <a href="javascript: AdicionarProduto({{produto.id}})"
-                                            class="btn btn-success">ADICIONAR</a>
-                                    </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="mt-auto">
+                                    <a href="javascript: AdicionarProduto({{produto.id}})"
+                                        class="btn btn-success">ADICIONAR</a>
                                 </div>
                             </div>
                         </div>
-                        {%endfor%}
                     </div>
+                    {%endfor%}
                 </div>
             </div>
-            <div class="d-flex align-items-end flex-column ">
-                <button class="btn btn-dark text-end">
-                    AVANÇAR
-                </button>
-            </div>
+        </div>
+        <div class="d-flex align-items-end flex-column ">
+            <button class="btn btn-dark text-end">
+                AVANÇAR
+            </button>
         </div>
     </div>
 </div>
@@ -82,9 +84,47 @@
         var url = "{% url 'adicionar_produto' 0 %}".replace("0", id);
         $.get(url, function (data, status) {
             $("#quantidadeCarrinho").text(Object.keys(data).length)
-        }).fail(function(){
+        }).fail(function () {
             alert(data.Mensagem);
         });
     }
+
+    function LimparFiltro() {
+        $(".divProduto").show()
+        $("#btnLimparFiltro").hide()
+        $("#txtBuscar").val('')
+    }
+
+    function BuscarProdutos() {
+        var url = "{% url 'buscar_produtos' %}"
+        $.post(
+            url,
+            $("#formProduto").serializeArray(),
+            function (resultado) {
+                if (!resultado.Sucesso)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        html: resultado.Mensagem
+                    })
+                else {
+                    if (resultado.Retorno.length <= 0)
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Nenhum produto encontrado',
+                            text: 'Verifique a digitação e tente novamente'
+                        })
+                    else {
+                        $("#btnLimparFiltro").show()
+                        $(".divProduto").hide()
+                        $.each(resultado.Retorno, function (i, produto_id) {
+                            $(`#divProduto-${produto_id}`).show()
+                        })
+                    }
+                }
+            }
+        )
+    }
+
 </script>
 {% endblock %}

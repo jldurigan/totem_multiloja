@@ -24,3 +24,11 @@
     color: inherit;
     text-decoration: inherit;
   }
+  .divRestaurante {
+    height: 150px!important;
+  }
+  .divRestaurante img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
