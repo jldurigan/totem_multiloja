@@ -16,6 +16,9 @@
                             <div class="col-md-12">
                                 <h2>Cadastro de Restaurante</h2>
                                 <form class="p-3">
+                                    {% for produto in produtos %}
+                                    <span>{{produto.nome}}</span>
+                                    <img src="{{produto.imagem.url}}">
                                     <div class="row">
                                         <div class="col-sm-3">
                                             <div class="form-group">
@@ -29,45 +32,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <label for="quantidade">Quantidade:</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <div class="form-group">
-                                                <input type="number" class="form-control" id="quantidade"
-                                                    name="quantidade" min="1" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <label for="quantidade">Quantidade:</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <div class="form-group">
-                                                <input type="number" class="form-control" id="quantidade"
-                                                    name="quantidade" min="1" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <label for="quantidade">Quantidade:</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <div class="form-group">
-                                                <input type="number" class="form-control" id="quantidade"
-                                                    name="quantidade" min="1" required>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {%endfor%}
                                     <button type="submit" class="btn btn-primary btn-block">Enviar</button>
                                 </form>
                             </div>
@@ -92,4 +57,9 @@
         </div>
     </div>
 </div>
-{% endblock %}''
+<script>
+    $(document).ready(function () {
+        ExibirAmbiente("{{restaurante.nome}}", "{{restaurante.imagem.url}}")
+    });
+</script>
+{% endblock %}

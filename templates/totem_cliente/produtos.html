@@ -14,9 +14,9 @@
                 <input type="text" id="txtBuscar" name="nome" class="form-control" placeholder="Procure um produto">
                 <button class="btn btn-light" type="button" onclick="BuscarProdutos()">&#128269;</button>
             </div>
-        </form>
     </div>
-    <button class="btn btn-warning" id="btnLimparFiltro" onclick="LimparFiltro()" style="display: none">Limpar
+    <button class="btn btn-warning" type="button" id="btnLimparFiltro" onclick="LimparFiltro()"
+        style="display: none">Limpar
         Filtro</button>
 </div>
 <h5 id="quantidadeCarrinho"></h5>
@@ -25,12 +25,18 @@
         <div class="col-md-3">
             <ul class="list-group">
                 {% for categoria in categorias %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <p><a class="link-unstyled" href="#">{{categoria.nome}}</a></p>
-                </li>
+                <a class="link-unstyled" href="javascript: SelecionarCategoria({{categoria.id}})">
+                    <input type="hidden" class="hiddenCategoria" id="hiddenCategoria-{{categoria.id}}"
+                        value="{{categoria.id}}">
+                    <li class="list-group-item d-flex justify-content-between align-items-center btnCategoria rounded"
+                        id="btnCategoria-{{categoria.id}}">
+                        <p>{{categoria.nome}}</p>
+                    </li>
+                </a>
                 {%endfor%}
             </ul>
         </div>
+        </form>
         <div class="col-md-9" style="max-height: 750px; overflow: auto">
             <div class="row">
                 <div class="row justify-content-between">
@@ -62,9 +68,9 @@
             </div>
         </div>
         <div class="d-flex align-items-end flex-column ">
-            <button class="btn btn-dark text-end">
+            <a class="btn btn-dark text-end" href="javascript: ListarCarrinho()">
                 AVANÇAR
-            </button>
+            </a>
         </div>
     </div>
 </div>
@@ -72,27 +78,69 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Abrir/fechar o menu lateral ao clicar no botão de
-        $('.menu-toggle').click(function () {
-            $('.sidebar').toggleClass('active');
-        });
-
         ExibirAmbiente("{{restaurante.nome}}", "{{restaurante.imagem.url}}")
     });
 
+    function SelecionarCategoria(id) {
+        $(".hiddenCategoria").removeAttr("name")
+        $(".btnCategoria").removeClass("active")
+        $(`#hiddenCategoria-${id}`).attr("name", "categoriaSelecionada")
+        $(`#btnCategoria-${id}`).addClass("active")
+        BuscarProdutos()
+    }
+
+    function ListarCarrinho() {
+        $.get(
+            "{% url 'listar_carrinho' %}",
+            function (resultado, status) {
+                if (status != 200)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        html: resultado.Mensagem
+                    })
+            }
+        )
+    }
+
     function AdicionarProduto(id) {
         var url = "{% url 'adicionar_produto' 0 %}".replace("0", id);
-        $.get(url, function (data, status) {
-            $("#quantidadeCarrinho").text(Object.keys(data).length)
-        }).fail(function () {
-            alert(data.Mensagem);
-        });
+        $.get(
+            url,
+            function (resultado) {
+                if (!resultado.Sucesso) {
+                    if (resultado.Mensagem.includes("Sessão")) {
+                        Swal.fire({
+                            title: 'Oops...',
+                            html: resultado.Mensagem,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        }).then((result) => {
+                            if (result.dismiss === Swal.DismissReason.timer) {
+                                window.location.href = "{% url 'home'%}"
+                            }
+                        })
+                    }
+                    else
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: resultado.Mensagem
+                        })
+                }
+                else
+                    $("#quantidadeCarrinho").text(Object.keys(resultado.Retorno).length)
+            })
     }
 
     function LimparFiltro() {
         $(".divProduto").show()
         $("#btnLimparFiltro").hide()
         $("#txtBuscar").val('')
+        $(".btnCategoria").removeClass("active")
     }
 
     function BuscarProdutos() {
@@ -101,26 +149,35 @@
             url,
             $("#formProduto").serializeArray(),
             function (resultado) {
-                if (!resultado.Sucesso)
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        html: resultado.Mensagem
-                    })
-                else {
-                    if (resultado.Retorno.length <= 0)
+                if (!resultado.Sucesso) {
+                    if (resultado.Mensagem.includes("Sessão")) {
                         Swal.fire({
-                            icon: 'info',
-                            title: 'Nenhum produto encontrado',
-                            text: 'Verifique a digitação e tente novamente'
-                        })
-                    else {
-                        $("#btnLimparFiltro").show()
-                        $(".divProduto").hide()
-                        $.each(resultado.Retorno, function (i, produto_id) {
-                            $(`#divProduto-${produto_id}`).show()
+                            title: 'Oops...',
+                            html: resultado.Mensagem,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        }).then((result) => {
+                            if (result.dismiss === Swal.DismissReason.timer) {
+                                window.location.href = "{% url 'home'%}"
+                            }
                         })
                     }
+                    else
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: resultado.Mensagem
+                        })
+                }
+                else {
+                    $("#btnLimparFiltro").show()
+                    $(".divProduto").hide()
+                    $.each(resultado.Retorno, function (i, produto_id) {
+                        $(`#divProduto-${produto_id}`).show()
+                    })
                 }
             }
         )
