@@ -1,57 +1,46 @@
 {% extends "totem_cliente/base.html" %}
 {% block content %}
 {% load static %}
-<div class="container-fluid border border-dark p-5">
-    <div>
-        <div class="row ">
-            <div class="col-md-12">
-                <div class="row ">
-                    <section class="col-md-6 ">
-                        <div class="row m-5">
-                            <div class="col-md-12 ">
-                                <button class="btn btn-dark">Voltar</button>
+<div class="container-fluid p-5">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-6" style="max-height: 900px; min-height: 900px; overflow:auto">
+                <div class="row m-5">
+                    <div class="col-md-12 ">
+                        <a href="{% url 'listar_produtos' restaurante.id %}" class="btn btn-dark">Voltar</a>
+                    </div>
+                </div>
+                <div class="row m-5">
+                    <div class="col-md-12">
+                        <h2>PRODUTOS ADICIONADOS</h2>
+                        <form>
+                            {% for produto in produtos %}
+                            <div class="divProduto">
+                                <img src="{{produto.imagem.url}}">
+                                <span>{{produto.nome}}</span>
                             </div>
-                        </div>
-                        <div class="row m-5">
-                            <div class="col-md-12">
-                                <h2>Cadastro de Restaurante</h2>
-                                <form class="p-3">
-                                    {% for produto in produtos %}
-                                    <span>{{produto.nome}}</span>
-                                    <img src="{{produto.imagem.url}}">
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <label for="quantidade">Quantidade:</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <div class="form-group">
-                                                <input type="number" class="form-control" id="quantidade"
-                                                    name="quantidade" min="1" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {%endfor%}
-                                    <button type="submit" class="btn btn-primary btn-block">Enviar</button>
-                                </form>
+                            <div class="form-group">
+                                <input type="number" class="form-control" id="quantidade" name="quantidade" min="1"
+                                    required>
                             </div>
-                        </div>
-                    </section>
-                    <section class="col-md-6">
-                        <div class="row m-5">
-                            <div class="col-md-12">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium necessitatibus
-                                doloribus, quam in perferendis tempore? Minus voluptas rerum excepturi. Quod ex rem
-                                repellat impedit commodi voluptas amet accusamus eius sit?
-                            </div>
-                        </div>
-                        <div class="row justify-content-end text-right m-5">
-                            <div class="col-md-12">
-                                <button class="btn btn-dark">Voltar</button>
-                            </div>
-                        </div>
-                    </section>
+                            {%endfor%}
+                        </form>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Enviar</button>
+            </div>
+            <div class="col-md-6">
+                <div class="row m-5">
+                    <div class="col-md-12">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium necessitatibus
+                        doloribus, quam in perferendis tempore? Minus voluptas rerum excepturi. Quod ex rem
+                        repellat impedit commodi voluptas amet accusamus eius sit?
+                    </div>
+                </div>
+                <div class="row justify-content-end text-right m-5">
+                    <div class="col-md-12">
+                        <a href="{% url 'listar_produtos' restaurante.id %}" class="btn btn-dark">Voltar</a>
+                    </div>
                 </div>
             </div>
         </div>

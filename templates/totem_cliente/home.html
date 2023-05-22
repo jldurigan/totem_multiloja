@@ -10,12 +10,16 @@
       {% csrf_token %}
       <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
         <input type="text" class="form-control" id="txtBuscar" name="nome" placeholder="Procure um restaurante">
-        <button class="btn btn-light" type="button" onclick="BuscarRestaurantes()">&#128269;</button>
+        <button class="btn btn-light" type="button" onclick="BuscarRestaurantes()">
+          <i class="fas fa-search"></i>
+        </button>
       </div>
     </form>
   </div>
 </header>
-<button class="btn btn-warning" id="btnLimparFiltro" onclick="LimparFiltro()" style="display: none">Limpar Filtro</button>
+<button class="btn btn-danger position-fixed" type="button" id="btnLimparFiltro" onclick="LimparFiltro()"
+  style="display: none; top: 400px; left: 650px;">Limpar
+  Filtro</button>
 <div class="d-flex flex-wrap ms-5 my-5">
   {% for restaurante in restaurantes %}
   <div class="divRestaurante m-5" id="divRestaurante-{{restaurante.id}}">

@@ -2,6 +2,10 @@
 {% block content %}
 {% load static %}
 
+<div class="position-fixed text-center" id="divCarrinho" style="display: none; top: 150px; left: 750px;">
+    <i class="fas fa-shopping-cart"></i>
+    <h5 id="quantidadeCarrinho"></h5>
+</div>
 <div class="col-md-12 mb-5">
     <div class="container">
         <form id="formProduto">
@@ -12,14 +16,15 @@
             </div>
             <div class="input-group" style="display: flex; width:50%; margin:0px auto;">
                 <input type="text" id="txtBuscar" name="nome" class="form-control" placeholder="Procure um produto">
-                <button class="btn btn-light" type="button" onclick="BuscarProdutos()">&#128269;</button>
+                <button class="btn btn-light" type="button" onclick="BuscarProdutos()">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
     </div>
-    <button class="btn btn-warning" type="button" id="btnLimparFiltro" onclick="LimparFiltro()"
-        style="display: none">Limpar
-        Filtro</button>
 </div>
-<h5 id="quantidadeCarrinho"></h5>
+<button class="btn btn-danger position-fixed" type="button" id="btnLimparFiltro" onclick="LimparFiltro()"
+    style="display: none; top: 250px; left: 650px;">Limpar
+    Filtro</button>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
@@ -38,47 +43,43 @@
         </div>
         </form>
         <div class="col-md-9" style="max-height: 750px; overflow: auto">
-            <div class="row">
-                <div class="row justify-content-between">
-                    {% for produto in produtos%}
-                    <div class="m-1 divProduto" id="divProduto-{{produto.id}}" style="max-width: 150px">
-                        <div class="card border-0">
-                            <div>
-                                {% if produto.imagem == "" or produto.imagem == null %}
-                                <img src="{% static 'assets/img/sem_foto.png' %}" class="img-fluid object-fit-contain"
-                                    alt="{{restaurante.nome}}">
-                                {% else %}
-                                <img src="{{produto.imagem.url}}" class="img-fluid object-fit-contain"
-                                    alt="{{produto.nome}}">
-                                {% endif %}
-                                <div class="text-center">
-                                    <span class="card-title">{{produto.nome}}</span>
-                                </div>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="mt-auto">
-                                    <a href="javascript: AdicionarProduto({{produto.id}})"
-                                        class="btn btn-success">ADICIONAR</a>
-                                </div>
-                            </div>
-                        </div>
+            <div class="d-flex flex-wrap ms-2 my-1">
+                {% for produto in produtos%}
+                <div class="divProduto mx-3 px-4" id="divProduto-{{produto.id}}" style="width: 150px">
+                    <div>
+                        {% if produto.imagem == "" or produto.imagem == null %}
+                        <img src="{% static 'assets/img/sem_foto.png' %}" alt="{{restaurante.nome}}">
+                        {% else %}
+                        <img src="{{produto.imagem.url}}" alt="{{produto.nome}}">
+                        {% endif %}
                     </div>
-                    {%endfor%}
+                    <div class="text-center" style="height: 100px">
+                        <span class="font-medium">{{produto.nome}}</span>
+                    </div>
+                    <div class="text-center" style="height: 30px">
+                        <span class="font-medium">R$ {{produto.preco}}</span>
+                    </div>
+                    <div>
+                        <a href="javascript: AdicionarProduto({{produto.id}})" class="btn btn-success">ADICIONAR</a>
+                    </div>
                 </div>
+                {%endfor%}
             </div>
         </div>
-        <div class="d-flex align-items-end flex-column ">
-            <a class="btn btn-dark text-end" href="javascript: ListarCarrinho()">
-                AVANÇAR
-            </a>
-        </div>
     </div>
+    <div class="d-flex align-items-end flex-column ">
+        <a class="btn btn-dark text-end" href="{% url 'listar_carrinho' %}">
+            AVANÇAR
+        </a>
+    </div>
+</div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script>
     $(document).ready(function () {
         ExibirAmbiente("{{restaurante.nome}}", "{{restaurante.imagem.url}}")
+        ExibirCarrinho("{{carrinho}}")
     });
 
     function SelecionarCategoria(id) {
@@ -87,20 +88,6 @@
         $(`#hiddenCategoria-${id}`).attr("name", "categoriaSelecionada")
         $(`#btnCategoria-${id}`).addClass("active")
         BuscarProdutos()
-    }
-
-    function ListarCarrinho() {
-        $.get(
-            "{% url 'listar_carrinho' %}",
-            function (resultado, status) {
-                if (status != 200)
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        html: resultado.Mensagem
-                    })
-            }
-        )
     }
 
     function AdicionarProduto(id) {
@@ -131,9 +118,22 @@
                             html: resultado.Mensagem
                         })
                 }
+                else if (resultado.Mensagem != "")
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Atenção',
+                        html: resultado.Mensagem
+                    })
                 else
-                    $("#quantidadeCarrinho").text(Object.keys(resultado.Retorno).length)
+                    ExibirCarrinho(Object.keys(resultado.Retorno).length)
             })
+    }
+
+    function ExibirCarrinho(itens) {
+        if (itens > 0) {
+            $("#divCarrinho").show()
+            $("#quantidadeCarrinho").text(itens)
+        }
     }
 
     function LimparFiltro() {
@@ -141,6 +141,7 @@
         $("#btnLimparFiltro").hide()
         $("#txtBuscar").val('')
         $(".btnCategoria").removeClass("active")
+        $(".hiddenCategoria").removeAttr("name")
     }
 
     function BuscarProdutos() {

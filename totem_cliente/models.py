@@ -33,7 +33,6 @@ class Produto(models.Model):
 class Pedido(models.Model):
     codigo_interno = models.CharField(max_length=10, null=False, blank=False)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
-    nome_cliente = models.CharField(max_length=100, null=False, blank=False)
     total = models.DecimalField(max_digits=7, decimal_places=2)
     observacoes = models.TextField(blank=True)
     data_hora_criacao = models.DateTimeField(auto_now_add=True)

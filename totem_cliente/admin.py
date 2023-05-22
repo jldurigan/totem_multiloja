@@ -18,12 +18,12 @@ class ListarCategorias(admin.ModelAdmin):
 class ListarProdutos(admin.ModelAdmin):
     list_display=("id", "nome", "preco", "imagem", "restaurante", "ativo")
     list_display_links=("id", "nome")
-    list_editable=("preco", "restaurante", "ativo")
+    list_editable=("preco", "imagem", "restaurante", "ativo")
     search_fields=("nome", "categoria__nome", "restaurante__nome")
     list_per_page=10
     
 class ListarPedidos(admin.ModelAdmin):
-    list_display=("id", "codigo_interno", "restaurante", "nome_cliente", "total", "observacoes", "data_hora_criacao", "ativo")
+    list_display=("id", "codigo_interno", "restaurante", "total", "observacoes", "data_hora_criacao", "ativo")
     list_display_links=("id", "codigo_interno")
     search_fields=("id", "codigo_interno", "restaurante__nome")
     list_per_page=10

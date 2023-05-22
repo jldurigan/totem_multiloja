@@ -32,3 +32,11 @@
     max-width: 100%;
     object-fit: contain;
   }
+  .divProduto {
+    min-height: 150px!important;
+  }
+  .divProduto img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
