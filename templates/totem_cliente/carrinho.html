@@ -2,53 +2,176 @@
 {% block content %}
 {% load static %}
 <div class="container-fluid p-5">
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-md-6" style="max-height: 900px; min-height: 900px; overflow:auto">
-                <div class="row m-5">
-                    <div class="col-md-12 ">
-                        <a href="{% url 'listar_produtos' restaurante.id %}" class="btn btn-dark">Voltar</a>
-                    </div>
-                </div>
-                <div class="row m-5">
-                    <div class="col-md-12">
+    <a href="{% url 'listar_produtos' restaurante.id %}" class="btn btn-dark">Voltar</a>
+    <div class="row">
+        <table>
+            <tr>
+                <th>
+                    <div class="pe-5 me-5">
                         <h2>PRODUTOS ADICIONADOS</h2>
-                        <form>
-                            {% for produto in produtos %}
-                            <div class="divProduto">
-                                <img src="{{produto.imagem.url}}">
+                    </div>
+                </th>
+                <th>
+                    <div class="my-5 me-5 pe-5">
+                        <h2>TOTAL</h2>
+                    </div>
+                </th>
+            </tr>
+        </table>
+    </div>
+    <div class="row" style="max-height: 600px; overflow: auto">
+        <div class="col-md-6">
+            <div class="table-responsive">
+                <table>
+                    <tbody>
+                        {% for produto in produtos %}
+                        <tr>
+                            <td>
+                                <img src="{{produto.imagem.url}}" style="height: 100px">
+                            </td>
+                            <td>
                                 <span>{{produto.nome}}</span>
-                            </div>
-                            <div class="form-group">
-                                <input type="number" class="form-control" id="quantidade" name="quantidade" min="1"
-                                    required>
-                            </div>
-                            {%endfor%}
-                        </form>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Enviar</button>
+                            </td>
+                            <td>
+                                <div class="input-group mb-3 justify-content-between" style="width: 80px">
+                                    <input type="number" class="form-control border border-primary"
+                                        id="quantidadeProduto-{{produto.id}}" name="quantidade" min="1" value="1"
+                                        required>
+                                    <div class="input-group-append">
+                                        <a class="btn btn-outline-danger"
+                                            href="javascript: RemoverProduto({{produto.id}})">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <a class="btn btn-outline-success" id="btnAumentar"
+                                            href="javascript: AlterarQuantidade(true, {{produto.id}})">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    </div>
+                                    <div class="input-group-prepend">
+                                        <a class="btn btn-outline-danger" id="btnDiminuir"
+                                            href="javascript: AlterarQuantidade(false, {{produto.id}})">
+                                            <i class="fas fa-minus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-6">
-                <div class="row m-5">
-                    <div class="col-md-12">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium necessitatibus
-                        doloribus, quam in perferendis tempore? Minus voluptas rerum excepturi. Quod ex rem
-                        repellat impedit commodi voluptas amet accusamus eius sit?
-                    </div>
-                </div>
-                <div class="row justify-content-end text-right m-5">
-                    <div class="col-md-12">
-                        <a href="{% url 'listar_produtos' restaurante.id %}" class="btn btn-dark">Voltar</a>
-                    </div>
-                </div>
+        </div>
+        <div class="col-md-6">
+            <div class="table-responsive">
+                <table class="w-100">
+                    <tbody>
+                        {% for produto in produtos %}
+                        <input type="hidden" class="hiddenProduto" id="hiddenProduto-{{produto.id}}" value="{{produto.id}}">
+                        <input type="hidden" class="hiddenPreco" id="hiddenPrecoProduto-{{produto.id}}" value="{{produto.preco}}">
+                        <tr style="height: 100px">
+                            <td class="text-center ps-5 ms-5">
+                                <h2 class="precoProduto" id="spanPrecoProduto-{{produto.id}}"></h2>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        </div>
+    </div>
+    <div class="position-absolute" style="left: 400px">
+        <h3>
+            <h3>Total da Compra: </h3>
+            <span class="h3" id="somaPrecos"></span>
+        </h3>
+        <div class="m-5">
+            <button class="btn btn-success">Avançar</button>
         </div>
     </div>
 </div>
 <script>
     $(document).ready(function () {
         ExibirAmbiente("{{restaurante.nome}}", "{{restaurante.imagem.url}}")
+        CarregarPrecos()
+        CalcularTotal()
     });
+
+    function CarregarPrecos() {
+        $.each($(".hiddenProduto"), function (i, hidden) {
+          var produtoId = $(hidden).val();
+          CalcularTotalProduto(produtoId)
+        });
+      }
+
+    function CalcularTotalProduto(id){
+        var valorOriginal = $(`#hiddenPrecoProduto-${id}`).val().replace(",", ".")
+        var qtd = $(`#quantidadeProduto-${id}`).val()
+        var valorTotal = valorOriginal*qtd
+        var valorFormatado = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        $(`#spanPrecoProduto-${id}`).val(valorTotal)
+        $(`#spanPrecoProduto-${id}`).html(valorFormatado)
+    }
+
+    function AlterarQuantidade(add, id) {
+        var qtd = $(`#quantidadeProduto-${id}`).val()
+        var preco = 0.0
+        if (add)
+            qtd++
+        else if (qtd > 1)
+            qtd--
+        $(`#quantidadeProduto-${id}`).val(qtd)
+        CalcularTotalProduto(id)
+        CalcularTotal()
+    }
+
+    function RemoverProduto(id) {
+        var url = "{% url 'remover_produto' 0 %}".replace("0", id);
+        $.get(
+            url,
+            function (resultado) {
+                if (!resultado.Sucesso) {
+                    if (resultado.Mensagem.includes("Sessão")) {
+                        Swal.fire({
+                            title: 'Oops...',
+                            html: resultado.Mensagem,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        }).then((result) => {
+                            if (result.dismiss === Swal.DismissReason.timer) {
+                                window.location.href = "{% url 'home'%}"
+                            }
+                        })
+                    }
+                    else
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: resultado.Mensagem
+                        })
+                }
+                else if (resultado.Mensagem != "")
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Atenção',
+                        html: resultado.Mensagem
+                    })
+                else
+                    window.location.href = "{% url 'listar_carrinho' %}"
+            })
+    }
+
+    function CalcularTotal() {
+        var valorTotal = 0.0
+        $.each($(".precoProduto"), function (i, preco) {
+            valorTotal += Number($(preco).val().replace(",", "."))
+        });
+        var valorFormatado = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        $("#somaPrecos").html(valorFormatado)
+    }
 </script>
 {% endblock %}

@@ -67,7 +67,7 @@ def buscar_produtos(request):
     if request.method != "POST":
         resultado["Mensagem"] = "Ação inválida!"
     elif "restaurante" not in request.session:
-        resultado["Mensagem"] = "Sessão encerrada, redirecionando para o início..."
+        resultado["Mensagem"] = "Sessão expirada, redirecionando para o início..."
     else:
         produtos = Produto.objects.order_by("nome").filter(
             ativo=True, restaurante=request.session["restaurante"]
@@ -99,7 +99,7 @@ def adicionar_produto(request, produto_id):
     resultado = {"Retorno": [], "Mensagem": "", "Sucesso": False}
 
     if "restaurante" not in request.session:
-        resultado["Mensagem"] = "Sessão encerrada, retornando ao início..."
+        resultado["Mensagem"] = "Sessão expirada, retornando ao início..."
     else:
         produto = Produto.objects.get(
             id=produto_id, restaurante=request.session["restaurante"]
@@ -126,15 +126,30 @@ def adicionar_produto(request, produto_id):
 
 
 def remover_produto(request, produto_id):
-    if "carrinho" in request.session:
-        if produto_id in request.session["carrinho"]:
+    resultado = {"Retorno": [], "Mensagem": "", "Sucesso": False}
+    if "restaurante" not in request.session:
+        resultado["Mensagem"] = "Sessão expirada, retornando ao início..."
+    else:
+        produto = Produto.objects.get(
+            id=produto_id, restaurante=request.session["restaurante"]
+        )
+        if not produto:
+            resultado["Mensagem"] = "Produto inválido!"
+        elif "carrinho" not in request.session:
+            resultado["Mensagem"] = "Não existem produtos adicionados!"
+        elif produto_id not in request.session["carrinho"]:
+            resultado["Mensagem"] = "O produto não foi adicionado!"
+        else:
             request.session["carrinho"].remove(produto_id)
 
-    request.session.modified = True
+            request.session.modified = True
 
-    carrinho = list(Produto.objects.filter(pk__in=request.session["carrinho"]))
+            for item in request.session["carrinho"]:
+                resultado["Retorno"].insert(0, item)
 
-    return JsonResponse(carrinho)
+            resultado["Sucesso"] = True
+
+    return JsonResponse(resultado)
 
 
 def listar_carrinho(request):
