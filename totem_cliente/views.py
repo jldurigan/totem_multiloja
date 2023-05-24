@@ -79,7 +79,7 @@ def buscar_produtos(request):
             if "categoriaSelecionada" in request.POST:
                 categoria = request.POST["categoriaSelecionada"]
                 if categoria:
-                    produtos = produtos.filter(categoria__in=categoria)
+                    produtos = produtos.filter(categoria=categoria)
             nome = request.POST["nome"]
             if nome:
                 produtos = produtos.filter(nome__icontains=nome)
