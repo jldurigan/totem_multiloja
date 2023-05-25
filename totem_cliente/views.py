@@ -1,3 +1,4 @@
+import random
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, JsonResponse
 
@@ -37,9 +38,10 @@ def listar_produtos(request, restaurante_id):
     if "restaurante" not in request.session:
         request.session["restaurante"] = restaurante_id
 
+    ##listando os itens do carrinho caso o usuario volte da tela de editar quantidades
     carrinho = []
-    if "carrinho" in request.session:
-        for item in request.session["carrinho"]:
+    if "produtos" in request.session:
+        for item in request.session["produtos"]:
             carrinho.insert(0, item)
 
     produtos = Produto.objects.order_by("nome").filter(
@@ -107,18 +109,19 @@ def adicionar_produto(request, produto_id):
         if not produto:
             resultado["Mensagem"] = "Produto inválido!"
         else:
-            if "carrinho" in request.session:
-                if produto_id in request.session["carrinho"]:
+            item = {str(produto_id): {"quantidade": 1, "preco": str(produto.preco)}}
+            if "produtos" in request.session:
+                if str(produto_id) in request.session["produtos"]:
                     resultado["Mensagem"] = "Produto já adicionado!"
                 else:
-                    request.session["carrinho"].insert(0, produto_id)
+                    request.session["produtos"].update(item)
             else:
-                request.session["carrinho"] = [produto_id]
+                request.session["produtos"] = item
 
             request.session.modified = True
 
-            for item in request.session["carrinho"]:
-                resultado["Retorno"].insert(0, item)
+            for item_add in request.session["produtos"]:
+                resultado["Retorno"].insert(0, item_add)
 
             resultado["Sucesso"] = True
 
@@ -135,16 +138,16 @@ def remover_produto(request, produto_id):
         )
         if not produto:
             resultado["Mensagem"] = "Produto inválido!"
-        elif "carrinho" not in request.session:
+        elif "produtos" not in request.session:
             resultado["Mensagem"] = "Não existem produtos adicionados!"
-        elif produto_id not in request.session["carrinho"]:
+        elif str(produto_id) not in request.session["produtos"]:
             resultado["Mensagem"] = "O produto não foi adicionado!"
         else:
-            request.session["carrinho"].remove(produto_id)
+            request.session["produtos"].pop(str(produto_id))
 
             request.session.modified = True
 
-            for item in request.session["carrinho"]:
+            for item in request.session["produtos"]:
                 resultado["Retorno"].insert(0, item)
 
             resultado["Sucesso"] = True
@@ -152,11 +155,38 @@ def remover_produto(request, produto_id):
     return JsonResponse(resultado)
 
 
+def alterar_quantidade(request):
+    resultado = {"Retorno": [], "Mensagem": "", "Sucesso": False}
+    if "restaurante" not in request.session:
+        resultado["Mensagem"] = "Sessão expirada, retornando ao início..."
+    else:
+        produto = Produto.objects.get(
+            id=request.POST.get("produto_id"),
+            restaurante=request.session["restaurante"],
+        )
+        if not produto:
+            resultado["Mensagem"] = "Produto inválido!"
+        elif "produtos" not in request.session:
+            resultado["Mensagem"] = "Não existem produtos adicionados!"
+        elif request.POST.get("produto_id") not in request.session["produtos"]:
+            resultado["Mensagem"] = "O produto não foi adicionado!"
+        else:
+            request.session["produtos"][request.POST.get("produto_id")].update(
+                {"quantidade": request.POST.get("quantidade")}
+            )
+            request.session.modified = True
+            resultado["Sucesso"] = True
+
+    return JsonResponse(resultado)
+
+
 def listar_carrinho(request):
     produtos = []
-    if "carrinho" in request.session:
-        for produto_id in request.session["carrinho"]:
-            produtos.insert(0, Produto.objects.get(id=produto_id))
+    if "produtos" in request.session:
+        for produto_id in request.session["produtos"]:
+            produto = Produto.objects.get(id=produto_id)
+            produto.quantidade = request.session["produtos"].get(produto_id).get("quantidade")
+            produtos.insert(0, produto)
 
     restaurante = Restaurante.objects.get(id=request.session["restaurante"])
 
@@ -168,4 +198,43 @@ def listar_carrinho(request):
 
 
 def listar_pagamento(request):
-    return render(request, "totem_cliente/pagamento.html")
+    produtos = []
+    total = 0.0
+    if "produtos" in request.session:
+        for produto_id in request.session["produtos"]:
+            produto = Produto.objects.get(id=produto_id)
+            produto.quantidade = request.session["produtos"].get(produto_id).get("quantidade")
+            produtos.insert(0, produto)
+            total += float(produto.preco)*int(produto.quantidade)
+
+    restaurante = Restaurante.objects.get(id=request.session["restaurante"])
+
+    return render(
+        request,
+        "totem_cliente/pagamento.html",
+        {"produtos": produtos, "restaurante": restaurante, "total": total},
+    )
+    
+def gerar_pedido(request):
+    resultado = {"Retorno": [], "Mensagem": "", "Sucesso": False}
+    pagamento_sucesso = True
+    
+    if not pagamento_sucesso:
+        resultado["Mensagem"] = "Problema no pagamento"
+    else:
+        restaurante = Restaurante.objects.get(id=request.session["restaurante"])
+        codigo_interno = str(random.randint(1, 999)).zfill(3)
+        total = 37.9 ##pegar do post
+        observacoes = "" ##pegar do post
+        pedido = Pedido(restaurante=restaurante, total=total, observacoes=observacoes)
+        pedido.save()
+        
+        ##for item in pegar da session
+        produto = "" ##pegar da session
+        quantidade = "" ##pegar da session
+        preco = "" ##fazer o calculo de quantidade * produto.preco
+        itempedido = ItemPedido(pedido=pedido, produto=produto, quantidade=quantidade, preco=preco)
+        
+    
+    
+    return JsonResponse(resultado)

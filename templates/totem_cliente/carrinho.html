@@ -24,41 +24,43 @@
             <div class="table-responsive">
                 <table>
                     <tbody>
-                        {% for produto in produtos %}
-                        <tr>
-                            <td>
-                                <img src="{{produto.imagem.url}}" style="height: 100px">
-                            </td>
-                            <td>
-                                <span>{{produto.nome}}</span>
-                            </td>
-                            <td>
-                                <div class="input-group mb-3 justify-content-between" style="width: 80px">
-                                    <input type="number" class="form-control border border-primary"
-                                        id="quantidadeProduto-{{produto.id}}" name="quantidade" min="1" value="1"
-                                        required>
-                                    <div class="input-group-append">
-                                        <a class="btn btn-outline-danger"
-                                            href="javascript: RemoverProduto({{produto.id}})">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
+                        <form id="formCarrinho">
+                            {%csrf_token%}
+                            {% for produto in produtos %}
+                            <tr>
+                                <td>
+                                    <img src="{{produto.imagem.url}}" style="height: 100px">
+                                </td>
+                                <td>
+                                    <span>{{produto.nome}}</span>
+                                </td>
+                                <td>
+                                    <div class="input-group mb-3 justify-content-between" style="width: 80px">
+                                        <input type="number" class="form-control border border-primary"
+                                            id="quantidadeProduto-{{produto.id}}" name="quantidade" min="1" value="{{produto.quantidade}}"
+                                            required>
+                                        <div class="input-group-append">
+                                            <a class="btn btn-outline-danger"
+                                                href="javascript: RemoverProduto({{produto.id}})">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <a class="btn btn-outline-success" id="btnAumentar"
+                                                href="javascript: AlterarQuantidade(true, {{produto.id}})">
+                                                <i class="fas fa-plus"></i>
+                                            </a>
+                                        </div>
+                                        <div class="input-group-prepend">
+                                            <a class="btn btn-outline-danger" id="btnDiminuir"
+                                                href="javascript: AlterarQuantidade(false, {{produto.id}})">
+                                                <i class="fas fa-minus"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="input-group-append">
-                                        <a class="btn btn-outline-success" id="btnAumentar"
-                                            href="javascript: AlterarQuantidade(true, {{produto.id}})">
-                                            <i class="fas fa-plus"></i>
-                                        </a>
-                                    </div>
-                                    <div class="input-group-prepend">
-                                        <a class="btn btn-outline-danger" id="btnDiminuir"
-                                            href="javascript: AlterarQuantidade(false, {{produto.id}})">
-                                            <i class="fas fa-minus"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -68,14 +70,17 @@
                 <table class="w-100">
                     <tbody>
                         {% for produto in produtos %}
-                        <input type="hidden" class="hiddenProduto" id="hiddenProduto-{{produto.id}}" value="{{produto.id}}">
-                        <input type="hidden" class="hiddenPreco" id="hiddenPrecoProduto-{{produto.id}}" value="{{produto.preco}}">
+                        <input type="hidden" class="hiddenProduto" id="hiddenProduto-{{produto.id}}"
+                            value="{{produto.id}}" name="produto_id">
+                        <input type="hidden" class="hiddenPreco" id="hiddenPrecoProduto-{{produto.id}}"
+                            value="{{produto.preco}}" name="preco">
                         <tr style="height: 100px">
                             <td class="text-center ps-5 ms-5">
                                 <h2 class="precoProduto" id="spanPrecoProduto-{{produto.id}}"></h2>
                             </td>
                         </tr>
                         {% endfor %}
+                        </form>
                     </tbody>
                 </table>
             </div>
@@ -100,30 +105,72 @@
 
     function CarregarPrecos() {
         $.each($(".hiddenProduto"), function (i, hidden) {
-          var produtoId = $(hidden).val();
-          CalcularTotalProduto(produtoId)
+            var produtoId = $(hidden).val();
+            CalcularTotalProduto(produtoId)
         });
-      }
+    }
 
-    function CalcularTotalProduto(id){
+    function CalcularTotalProduto(id) {
         var valorOriginal = $(`#hiddenPrecoProduto-${id}`).val().replace(",", ".")
         var qtd = $(`#quantidadeProduto-${id}`).val()
-        var valorTotal = valorOriginal*qtd
+        var valorTotal = valorOriginal * qtd
         var valorFormatado = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
         $(`#spanPrecoProduto-${id}`).val(valorTotal)
         $(`#spanPrecoProduto-${id}`).html(valorFormatado)
     }
 
     function AlterarQuantidade(add, id) {
+        var url = "{% url 'alterar_quantidade' %}"
         var qtd = $(`#quantidadeProduto-${id}`).val()
         var preco = 0.0
         if (add)
             qtd++
         else if (qtd > 1)
             qtd--
-        $(`#quantidadeProduto-${id}`).val(qtd)
-        CalcularTotalProduto(id)
-        CalcularTotal()
+        $.post(
+            url,
+            {
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+                produto_id: id,
+                quantidade: qtd
+            },
+            function (resultado) {
+                if (!resultado.Sucesso) {
+                    if (resultado.Mensagem.includes("Sessão")) {
+                        Swal.fire({
+                            title: 'Oops...',
+                            html: resultado.Mensagem,
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        }).then((result) => {
+                            if (result.dismiss === Swal.DismissReason.timer) {
+                                window.location.href = "{% url 'home'%}"
+                            }
+                        })
+                    }
+                    else
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: resultado.Mensagem
+                        })
+                }
+                else if (resultado.Mensagem != "")
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Atenção',
+                        html: resultado.Mensagem
+                    })
+                else {
+                    $(`#quantidadeProduto-${id}`).val(qtd)
+                    CalcularTotalProduto(id)
+                    CalcularTotal()
+                }
+            })
+
     }
 
     function RemoverProduto(id) {

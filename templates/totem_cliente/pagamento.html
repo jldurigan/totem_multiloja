@@ -3,31 +3,32 @@
 {% include 'components/quote_detail.html' with quote=first_quote %}
 {% block content %}
 {% load static %}
-<div class="container-fluid border border-dark p-5">
+<div class="container-fluid p-5">
   <div>
     <div class="row">
       <div class="col-md-12">
         <div class="row">
-          <section class="col-md-6">
+          <div class="col-md-6">
             <div class="row m-5">
               <div class="col-md-12">
-                <button class="btn btn-dark">Voltar</button>
+                <a class="btn btn-dark" href="{% url 'listar_carrinho' %}">Voltar</a>
               </div>
             </div>
             <div class="row m-5">
               <div class="col-md-12">
-                <h2>Produtos selecionados:</h2>
-                <ul class="list-group">
-                  <li class="list-group-item">An item</li>
-                  <li class="list-group-item">A second item</li>
-                  <li class="list-group-item">A third item</li>
-                  <li class="list-group-item">A fourth item</li>
-                  <li class="list-group-item">And a fifth one</li>
+                <h2>Produtos Adicionados:</h2>
+                <ul class="list-group" style="max-height: 600px; overflow: auto">
+                  {%for produto in produtos %}
+                  <li class="list-group-item">
+                    <img src="{{produto.imagem.url}}" style="height: 100px">
+                    <h3>{{produto.nome}} x{{produto.quantidade}}</h3>
+                  </li>
+                  {%endfor%}
                 </ul>
               </div>
             </div>
-          </section>
-          <section class="col-md-6">
+          </div>
+          <div class="col-md-6">
             <div class="row m-5">
               <div class="col-md-12">
                 <h4 class="h5">Forma de pagamento:</h4>
@@ -47,17 +48,19 @@
             </div>
             <div class="row justify-content-end text-right m-5">
               <div class="col-md-12">
-                <button type="button" class="btn btn-cta-secondary" data-toggle="modal"
-                  data-target="#{{ quote.priceId }}" data-id="{{ quote.priceId }}">More Info</button>
+                <textarea maxlength="500" placeholder="Observações" rows="5"></textarea>
                 <!-- Modal -->
-                <div class="modal fade" id="{{ quote.priceId }}" tabindex="-1" role="dialog"
-                  aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div>
+                  <a class="btn btn-success" href="">Avançar</a>
                 </div>
               </div>
-          </section>
+            </div>
+          </div>
+          <div>
+            <h2>Total: R$ {{total}}</h2>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+  {% endblock %}
