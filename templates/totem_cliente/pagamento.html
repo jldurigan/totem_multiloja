@@ -48,10 +48,13 @@
             </div>
             <div class="row justify-content-end text-right m-5">
               <div class="col-md-12">
-                <textarea maxlength="500" placeholder="Observações" rows="5"></textarea>
+                <form id="formPedido">
+                  {%csrf_token%}
+                  <textarea maxlength="500" name="observacoes" placeholder="Observações" rows="5"></textarea>
+                </form>
                 <!-- Modal -->
                 <div>
-                  <a class="btn btn-success" href="">Avançar</a>
+                  <a class="btn btn-success" href="javascript: RealizarPagamento()">Avançar</a>
                 </div>
               </div>
             </div>
@@ -63,4 +66,105 @@
       </div>
     </div>
   </div>
+  <script>
+    $(document).ready(function () {
+      ExibirAmbiente("{{restaurante.nome}}", "{{restaurante.imagem.url}}")
+    });
+
+    function RealizarPagamento() {
+      var url = "{% url 'realizar_pagamento' %}"
+      $.get(
+        url,
+        function (resultado) {
+          if (!resultado.Sucesso) {
+            if (resultado.Mensagem.includes("Sessão")) {
+              Swal.fire({
+                title: 'Oops...',
+                html: resultado.Mensagem,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  window.location.href = "{% url 'home'%}"
+                }
+              })
+            }
+            else
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: resultado.Mensagem
+              })
+          }
+          else if (resultado.Mensagem != "")
+            Swal.fire({
+              icon: 'info',
+              title: 'Atenção',
+              html: resultado.Mensagem
+            })
+          else {
+            GerarPedido()
+          }
+        })
+    }
+
+    function GerarPedido() {
+      var url = "{% url 'gerar_pedido' %}"
+      $.post(
+        url,
+        $("#formPedido").serializeArray(),
+        function (resultado) {
+          if (!resultado.Sucesso) {
+            if (resultado.Mensagem.includes("Sessão")) {
+              Swal.fire({
+                title: 'Oops...',
+                html: resultado.Mensagem,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  window.location.href = "{% url 'home'%}"
+                }
+              })
+            }
+            else
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: resultado.Mensagem
+              })
+          }
+          else if (resultado.Mensagem != "")
+            Swal.fire({
+              icon: 'info',
+              title: 'Atenção',
+              html: resultado.Mensagem
+            })
+          else {
+            Swal.fire({
+              title: 'Sucesso!',
+              icon: 'success',
+              showConfirmButton: true,
+              confirmButtonText: 'Encerrar',
+              html: `Pedido realizado: ${resultado.Retorno}. Retire no balcão`,
+              timer: 30000,
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading()
+              }
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = "{% url 'home'%}"
+              }
+            })
+          }
+        })
+    }
+  </script>
   {% endblock %}

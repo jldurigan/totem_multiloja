@@ -185,7 +185,9 @@ def listar_carrinho(request):
     if "produtos" in request.session:
         for produto_id in request.session["produtos"]:
             produto = Produto.objects.get(id=produto_id)
-            produto.quantidade = request.session["produtos"].get(produto_id).get("quantidade")
+            produto.quantidade = (
+                request.session["produtos"].get(produto_id).get("quantidade")
+            )
             produtos.insert(0, produto)
 
     restaurante = Restaurante.objects.get(id=request.session["restaurante"])
@@ -203,9 +205,14 @@ def listar_pagamento(request):
     if "produtos" in request.session:
         for produto_id in request.session["produtos"]:
             produto = Produto.objects.get(id=produto_id)
-            produto.quantidade = request.session["produtos"].get(produto_id).get("quantidade")
+            produto.quantidade = (
+                request.session["produtos"].get(produto_id).get("quantidade")
+            )
             produtos.insert(0, produto)
-            total += float(produto.preco)*int(produto.quantidade)
+            total += float(produto.preco) * int(produto.quantidade)
+
+        request.session["total"] = total
+        request.session.modified = True
 
     restaurante = Restaurante.objects.get(id=request.session["restaurante"])
 
@@ -214,27 +221,58 @@ def listar_pagamento(request):
         "totem_cliente/pagamento.html",
         {"produtos": produtos, "restaurante": restaurante, "total": total},
     )
-    
+
+
+def realizar_pagamento(request):
+    resultado = {"Retorno": [], "Mensagem": "", "Sucesso": False}
+
+    if (
+        "produtos" not in request.session
+        or "restaurante" not in request.session
+        or "total" not in request.session
+    ):
+        resultado["Mensagem"] = "Sessão expirada, retornando para o início..."
+    else:
+        sucesso_pagamento = True
+
+        if not sucesso_pagamento:
+            resultado["Mensagem"] = "Erro ao realizar o pagamento. Tente novamente"
+        else:
+            resultado["Sucesso"] = True
+
+    return JsonResponse(resultado)
+
+
 def gerar_pedido(request):
     resultado = {"Retorno": [], "Mensagem": "", "Sucesso": False}
-    pagamento_sucesso = True
-    
-    if not pagamento_sucesso:
-        resultado["Mensagem"] = "Problema no pagamento"
-    else:
-        restaurante = Restaurante.objects.get(id=request.session["restaurante"])
-        codigo_interno = str(random.randint(1, 999)).zfill(3)
-        total = 37.9 ##pegar do post
-        observacoes = "" ##pegar do post
-        pedido = Pedido(restaurante=restaurante, total=total, observacoes=observacoes)
-        pedido.save()
+
+    restaurante = Restaurante.objects.get(id=request.session["restaurante"])
+    codigo_interno = str(random.randint(1, 999)).zfill(3)
+    total = request.session["total"]
+    observacoes = request.POST.get("observacoes")
+    pedido = Pedido(
+        codigo_interno=codigo_interno,
+        restaurante=restaurante,
+        total=total,
+        observacoes=observacoes,
+    )
+    pedido.save()
+
+    for produto_id in request.session["produtos"]:
+        produto = Produto.objects.get(id=produto_id)
+        produto.quantidade = (
+            request.session["produtos"].get(produto_id).get("quantidade")
+        )
+
         
-        ##for item in pegar da session
-        produto = "" ##pegar da session
-        quantidade = "" ##pegar da session
-        preco = "" ##fazer o calculo de quantidade * produto.preco
-        itempedido = ItemPedido(pedido=pedido, produto=produto, quantidade=quantidade, preco=preco)
-        
+        quantidade = produto.quantidade
+        preco = float(produto.preco) * int(produto.quantidade)
+        itempedido = ItemPedido(
+            pedido=pedido, produto=produto, quantidade=quantidade, preco=preco
+        )
+        itempedido.save()
     
-    
+    resultado["Retorno"] = codigo_interno
+    resultado["Sucesso"] = True
+
     return JsonResponse(resultado)

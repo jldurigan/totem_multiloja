@@ -20,6 +20,7 @@ urlpatterns = [
     
     #pagamento
     path('pagamento', listar_pagamento, name="listar_pagamento"),
+    path('realizar_pagamento', realizar_pagamento, name="realizar_pagamento"),
     
     ##pedido
     path('gerar_pedido', gerar_pedido, name="gerar_pedido")
