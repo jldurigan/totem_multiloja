@@ -73,42 +73,54 @@
 
     function RealizarPagamento() {
       var url = "{% url 'realizar_pagamento' %}"
-      $.get(
-        url,
-        function (resultado) {
-          if (!resultado.Sucesso) {
-            if (resultado.Mensagem.includes("Sessão")) {
-              Swal.fire({
-                title: 'Oops...',
-                html: resultado.Mensagem,
-                timer: 2000,
-                timerProgressBar: true,
-                didOpen: () => {
-                  Swal.showLoading()
+      Swal.fire({
+        title: 'Aguardando',
+        html: 'Siga as instruções da máquina',
+        icon: 'info',
+        timer: 0,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          $.get(
+            url,
+            function (resultado) {
+              Swal.close();
+              if (!resultado.Sucesso) {
+                if (resultado.Mensagem.includes("Sessão")) {
+                  Swal.fire({
+                    title: 'Oops...',
+                    html: resultado.Mensagem,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                      Swal.showLoading()
+                    }
+                  }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                      window.location.href = "{% url 'home'%}"
+                    }
+                  })
                 }
-              }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                  window.location.href = "{% url 'home'%}"
-                }
-              })
-            }
-            else
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                html: resultado.Mensagem
-              })
-          }
-          else if (resultado.Mensagem != "")
-            Swal.fire({
-              icon: 'info',
-              title: 'Atenção',
-              html: resultado.Mensagem
+                else
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: resultado.Mensagem
+                  })
+              }
+              else if (resultado.Mensagem != "")
+                Swal.fire({
+                  icon: 'info',
+                  title: 'Atenção',
+                  html: resultado.Mensagem
+                })
+              else {
+                GerarPedido()
+              }
             })
-          else {
-            GerarPedido()
-          }
-        })
+        }
+      })
     }
 
     function GerarPedido() {
@@ -152,11 +164,30 @@
               icon: 'success',
               showConfirmButton: true,
               confirmButtonText: 'Encerrar',
-              html: `Pedido realizado: ${resultado.Retorno}. Retire no balcão`,
+              html: `Pedido realizado com sucesso! Seu código é: ${resultado.Retorno}. Retire no balcão<br/><br/>`+
+              'Encerrando em <strong></strong> segundos.<br><br/>' +
+              '<button id="encerrar" class="btn btn-primary">' +
+                'Encerrar' +
+              '</button>',
               timer: 30000,
               timerProgressBar: true,
               didOpen: () => {
+                var content = Swal.getHtmlContainer()
+                var $ = content.querySelector.bind(content)
+
+                var encerrar = $('#encerrar')
+
                 Swal.showLoading()
+
+                timerInterval = setInterval(() => {
+                  Swal.getHtmlContainer().querySelector('strong')
+                    .textContent = (Swal.getTimerLeft() / 1000)
+                      .toFixed(0)
+                }, 100)
+
+                encerrar.addEventListener('click', () => {
+                  window.location.href = "{% url 'home'%}"
+                })
               }
             }).then((result) => {
               if (result.dismiss === Swal.DismissReason.timer) {

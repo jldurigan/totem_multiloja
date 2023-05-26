@@ -26,6 +26,7 @@
   }
   .divRestaurante {
     height: 150px!important;
+    max-width: 150px!important;
   }
   .divRestaurante img {
     max-height: 100%;
